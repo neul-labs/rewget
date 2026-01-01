@@ -10,6 +10,15 @@ When no `--rwget-*` flags are used:
 - exit codes are identical.
 - files and logs created by wget match exactly.
 
+## Golden suite goals
+
+The suite should validate that rwget is indistinguishable from wget in normal use, including:
+
+- Command-line flag handling and ordering.
+- Progress and logging output in TTY and non-TTY contexts.
+- File output and metadata behavior.
+- Recursion and timestamping behavior.
+
 ## Minimum golden suite
 
 1. Single file download
@@ -21,6 +30,19 @@ When no `--rwget-*` flags are used:
 7. Recursion basics (`-r`, `-l 1`, `--spider`)
 8. Timestamping (`-N`) and conditional GETs
 9. Logging (`-o logfile`, `-q`, `-nv`)
+
+## Harness expectations
+
+- Each test runs wget and rwget with identical inputs and environment.
+- Output comparisons are byte-for-byte for stdout, stderr, and log files.
+- File tree comparisons verify paths, sizes, and timestamps.
+- Tests should run against a controlled fixture server to avoid flakiness.
+
+## Platform matrix
+
+- Linux is the initial reference platform.
+- Additional platforms should be added only after strict mode is stable on Linux.
+- Each platform must have a pinned wget binary for the compliance baseline.
 
 ## Gate
 
