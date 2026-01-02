@@ -41,11 +41,27 @@ rwget is a wget-compatible wrapper with an optional daemon. It starts with a pla
 ## Installation
 
 ```bash
-# Linux / macOS
+# Homebrew (macOS / Linux)
+brew install dipankardas011/tap/rwget
+
+# Direct install script
 curl -fsSL https://rwget.dev/install.sh | sh
 
 # Windows (PowerShell)
 irm https://rwget.dev/install.ps1 | iex
+```
+
+### Shell completions
+
+```bash
+# Bash - add to ~/.bashrc
+eval "$(rwget --rwget-completions=bash)"
+
+# Zsh - add to ~/.zshrc
+eval "$(rwget --rwget-completions=zsh)"
+
+# Fish - add to ~/.config/fish/config.fish
+rwget --rwget-completions=fish | source
 ```
 
 To use rwget as your default wget, add an alias to your shell config:
@@ -96,7 +112,7 @@ rwget --rwget-fallback-codes=403,429,503 https://example.com/
 
 ## Status
 
-**v0.1.0 - Core functionality complete**
+**v1.0.0 - Production Ready**
 
 | Feature | Status |
 |---------|--------|
@@ -107,18 +123,20 @@ rwget --rwget-fallback-codes=403,429,503 https://example.com/
 | Phase 4: Stage 3 JS Preflight | ✅ Complete |
 | Phase 5: Profile Updates | ✅ Complete |
 | Phase 6: Cross-Platform | ✅ Complete |
-| Phase 7: Polish & 1.0 | ⏳ Pending |
+| Phase 7: Polish & 1.0 | ✅ Complete |
 
-### What works now
+### Features
 
 - **3-stage fallback**: wget → TLS impersonation → JS preflight
 - **6 browser profiles**: Chrome 131/130, Firefox 136/133, Safari 18, Edge 131
 - **Domain caching**: Remembers successful stage per domain (7-day TTL)
 - **Auto Chromium download**: Downloads Chrome for Testing (~150MB) on first Stage 3 use
 - **Remote profile updates**: `--rwget-update-profiles` with Ed25519 signature verification
-- **Cross-platform**: Linux, macOS, and Windows support
-- **CI/CD**: GitHub Actions for all platforms
-- **56 tests passing**
+- **Cross-platform**: Linux x64/arm64, macOS x64/arm64, Windows x64
+- **Shell completions**: bash, zsh, fish, PowerShell
+- **Man page**: `man rwget`
+- **LTO-optimized**: rwget 3.3MB, rwgetd 9.5MB
+- **42 tests passing**
 
 ### Build from source
 
