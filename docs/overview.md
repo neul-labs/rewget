@@ -1,48 +1,68 @@
 # Overview
 
-rwget is a drop-in wrapper around wget with an optional daemon. The default path is a direct exec of the bundled wget engine with arguments unchanged. Additional features are explicitly opt-in via `--rwget-*` flags.
+rwget is a drop-in wrapper around wget with automatic fallback and an optional daemon. By default, rwget attempts a plain wget request first, then progressively retries with browser emulation when encountering blocking responses (403, 429, etc.). This behavior can be disabled with `--rwget-no-fallback` for scripting.
 
 ## Terminology
 
 - Engine: the pinned wget binary that defines canonical behavior.
 - Shim: the `rwget` CLI that parses `--rwget-*` flags only.
-- Daemon: `rwgetd`, a service process that executes wget jobs.
+- Daemon: `rwgetd`, a service process that executes wget jobs and manages browser pool.
 - Transport: the IPC layer used between `rwget` and `rwgetd` (nng).
-- Inline daemon: a foreground `rwgetd` process spawned by `rwget` and tied to the current run.
+- Inline daemon: a foreground `rwgetd` process spawned by `rwget` on first fallback.
+- Fallback: automatic retry with progressive enhancement when wget encounters blocking responses.
 - Preflight: a browser-like request or JS-enabled navigation to obtain cookies and a final URL.
 - Replay: running wget with the original arguments and exported state.
-- Strict mode: the default behavior when no `--rwget-*` flags are used.
+- Stage: one of three fallback levels (plain wget → impersonation → JS preflight).
 
 ## Compatibility invariants
 
-When no `--rwget-*` flags are present:
+On successful download (regardless of which stage succeeded):
 
-- stdout and stderr match the engine output exactly.
-- exit code matches the engine exit code.
-- created files, timestamps, and logs match the engine behavior.
+- stdout and stderr match what wget would produce for the final URL.
+- exit code is 0 on success, non-zero on failure.
+- created files, timestamps, and logs match wget behavior.
 - `.wgetrc` and `--config` semantics are unchanged.
+
+With `--rwget-no-fallback`:
+
+- Behavior is identical to running wget directly.
+- stdout, stderr, and exit code match the engine exactly.
 
 ## Operating modes
 
-- Direct exec: `rwget` execs `wget_engine` in-place.
-- Daemon exec: `rwget` delegates to `rwgetd` and streams output. The daemon can be started inline on first use.
-- Preflight + replay: a preflight collects cookies and a final URL, then wget handles file writing and recursion. JS preflight runs in the daemon and requires the inline daemon path.
+- **Stage 1 (Plain wget)**: `rwget` runs `wget_engine` directly. If successful, done. If blocked, proceed to Stage 2.
+- **Stage 2 (Impersonation)**: Uses browser-like headers and TLS fingerprint to obtain cookies and final URL, then replays with wget.
+- **Stage 3 (JS preflight)**: Runs a real browser session to solve challenges, exports cookies, then replays with wget.
 
-## Opt-in layers
+The daemon (`rwgetd`) is started inline when Stage 2 or 3 is needed. It manages a warm browser pool for subsequent requests.
 
-rwget adds two optional layers:
+## Fallback stages
 
-- Impersonation preflight: uses a browser-like request profile to obtain a final URL, headers, and cookies, then replays with wget for file semantics.
-- JS preflight: uses a real browser session to solve challenges and export cookies before replaying with wget.
+rwget automatically progresses through these stages on failure:
 
-Both layers are intended to preserve wget's behavior for recursion, output files, and logging while improving fetch success on complex sites.
+- **Impersonation preflight (Stage 2)**: uses a browser-like request profile to obtain a final URL, headers, and cookies, then replays with wget.
+- **JS preflight (Stage 3)**: uses a real browser session to solve challenges (Cloudflare, CAPTCHAs) and export cookies before replaying with wget.
 
-## Preflight semantics
+Both stages preserve wget's behavior for recursion, output files, and logging while improving fetch success on protected sites.
 
-- Preflight applies to the root URL(s) provided to rwget.
-- Recursion uses the exported cookies and the original wget arguments.
-- Preflight should not alter wget flags, output paths, or timestamping behavior.
-- JS preflight requires the daemon and is not available in direct exec mode.
+## Fallback semantics
+
+- Fallback applies to **every request**, including recursive downloads.
+- Each blocked request independently retries through the stages.
+- Cookies obtained during fallback are accumulated in the session cookie jar.
+- Fallback does not alter wget flags, output paths, or timestamping behavior.
+- The daemon is spawned inline when Stage 2 or 3 is first needed.
+- Fallback messages are printed to stderr (suppressible with `--rwget-quiet`).
+
+## Timeouts
+
+Each stage has an independent timeout:
+
+- **Stage 1**: Inherits wget's timeout settings (`--timeout`, `--connect-timeout`, etc.)
+- **Stage 2**: 15 seconds default (`--rwget-timeout-stage2`)
+- **Stage 3**: 30 seconds default (`--rwget-timeout-stage3`)
+
+When a stage times out, rwget proceeds to the next stage (if available).
 
 ## Cookie handling
 
@@ -52,7 +72,23 @@ Both layers are intended to preserve wget's behavior for recursion, output files
 
 ## Engine selection
 
-The baseline is a pinned GNU Wget binary. If a second engine is supported (for example, Wget2), it is a separate compliance target and must be explicitly selected and tested.
+rwget supports two wget implementations:
+
+| Engine | Flag | Notes |
+|--------|------|-------|
+| GNU Wget | `--rwget-engine=wget` | Default, maximum compatibility |
+| GNU Wget2 | `--rwget-engine=wget2` | HTTP/2 support, modern features |
+
+Each engine is a separate compliance target with its own golden tests.
+
+## Domain stage caching
+
+rwget remembers which stage succeeded for each domain:
+
+- First request: Stage 1 fails → Stage 2 succeeds → cache `domain → Stage 2`
+- Future requests: Start directly at Stage 2
+
+Cache expires after 7 days. Disable with `--rwget-no-cache`.
 
 ## Implementation direction
 

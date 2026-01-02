@@ -1,0 +1,72 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/rwget",
+    "crates/rwgetd",
+    "crates/rwget-core",
+]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/user/rwget"
+authors = ["rwget contributors"]
+
+# Release optimizations
+[profile.release]
+lto = "thin"
+strip = true
+codegen-units = 1
+opt-level = 3
+panic = "abort"
+
+# Faster builds for development
+[profile.dev]
+opt-level = 0
+debug = true
+
+# Profile for CI (faster than release, still optimized)
+[profile.ci]
+inherits = "release"
+lto = false
+codegen-units = 16
+
+[workspace.dependencies]
+# Shared dependencies
+thiserror = "1.0"
+anyhow = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# CLI
+clap = { version = "4.0", features = ["derive", "string"] }
+clap_complete = "4.5"
+clap_mangen = "0.2"
+
+# Filesystem utilities
+which = "7.0"
+dirs = "5.0"
+
+# IPC
+nng = "1.0"
+
+# HTTP with TLS impersonation
+rquest = "5.1"
+rquest-util = "2.2"
+
+# Headless browser for Stage 3
+chromiumoxide = { version = "0.7", features = ["tokio-runtime"], default-features = false }
+futures = "0.3"
+
+# Profile updates
+ed25519-dalek = { version = "2.1", features = ["std"] }
+ureq = "2.9"
+base64 = "0.22"
+sha2 = "0.10"
+
+# Internal crates
+rwget-core = { path = "crates/rwget-core" }

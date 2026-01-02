@@ -1,25 +1,55 @@
 # Compliance
 
-Compatibility with wget is the primary goal. rwget is expected to pass a golden test suite that compares `rwget` output against the pinned `wget_engine`.
+Compatibility with wget is the primary goal. rwget should produce identical output to wget when downloads succeed, regardless of which fallback stage was used.
 
-## Strict mode
+## Compatibility modes
 
-When no `--rwget-*` flags are used:
+### Default mode (with fallback)
 
-- stdout and stderr match exactly.
-- exit codes are identical.
-- files and logs created by wget match exactly.
+When rwget succeeds at any stage:
+
+- Downloaded files match what wget would produce for the final URL.
+- Exit code is 0 on success.
+- Fallback messages go to stderr (suppressible with `--rwget-quiet`).
+
+### Strict mode (`--rwget-no-fallback`)
+
+When `--rwget-no-fallback` is used:
+
+- stdout and stderr match wget exactly.
+- Exit codes are identical to wget.
+- Files and logs created match wget exactly.
+- No automatic retries; single-attempt behavior.
+
+Use strict mode for:
+- Scripting that depends on exact wget behavior
+- CI/CD pipelines
+- Compatibility testing
 
 ## Golden suite goals
 
-The suite should validate that rwget is indistinguishable from wget in normal use, including:
+The suite validates two things:
 
-- Command-line flag handling and ordering.
-- Progress and logging output in TTY and non-TTY contexts.
-- File output and metadata behavior.
-- Recursion and timestamping behavior.
+1. **Strict mode**: rwget with `--rwget-no-fallback` is indistinguishable from wget.
+2. **Fallback mode**: rwget produces correct files when fallback stages are used.
+
+### Strict mode validation
+
+- Command-line flag handling and ordering
+- Progress and logging output in TTY and non-TTY contexts
+- File output and metadata behavior
+- Recursion and timestamping behavior
+
+### Fallback mode validation
+
+- Correct file content after Stage 2/3 success
+- Cookie jar correctness after preflight
+- Redirect chain handling through fallback
+- Recursive downloads with mixed stage successes
 
 ## Minimum golden suite
+
+### Strict mode tests (with `--rwget-no-fallback`)
 
 1. Single file download
 2. Redirect handling (`--max-redirect`)
@@ -31,19 +61,37 @@ The suite should validate that rwget is indistinguishable from wget in normal us
 8. Timestamping (`-N`) and conditional GETs
 9. Logging (`-o logfile`, `-q`, `-nv`)
 
+### Fallback mode tests
+
+1. Stage 2 success after Stage 1 403
+2. Stage 3 success after Stage 2 failure
+3. Recursive download with per-page fallback
+4. Cookie accumulation across fallback stages
+5. Timeout handling per stage
+6. Body pattern detection triggering fallback
+7. `--rwget-quiet` suppresses fallback messages
+
 ## Harness expectations
 
-- Each test runs wget and rwget with identical inputs and environment.
-- Output comparisons are byte-for-byte for stdout, stderr, and log files.
-- File tree comparisons verify paths, sizes, and timestamps.
-- Tests should run against a controlled fixture server to avoid flakiness.
+- Strict mode tests run wget and rwget with identical inputs; compare byte-for-byte.
+- Fallback tests use a fixture server that returns 403/challenge pages initially.
+- File tree comparisons verify paths, sizes, and content hashes.
+- Tests should run against controlled fixture servers to avoid flakiness.
 
 ## Platform matrix
 
-- Linux is the initial reference platform.
-- Additional platforms should be added only after strict mode is stable on Linux.
-- Each platform must have a pinned wget binary for the compliance baseline.
+| Platform | Status | Notes |
+|----------|--------|-------|
+| Linux x86_64 | Primary | Reference platform |
+| Linux arm64 | Supported | Raspberry Pi, cloud ARM |
+| macOS x86_64 | Supported | Intel Macs |
+| macOS arm64 | Supported | Apple Silicon |
+| Windows x86_64 | Supported | Via WSL2 or native |
+
+Each platform must have a pinned wget binary for the compliance baseline.
 
 ## Gate
 
-No rwget-specific features should ship until strict mode passes the suite on supported platforms.
+No rwget release until:
+- Strict mode passes 100% on all supported platforms
+- Fallback mode passes on Linux (reference platform)

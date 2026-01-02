@@ -1,0 +1,27 @@
+[package]
+name = "rwget"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "wget-compatible wrapper with automatic fallback"
+
+[[bin]]
+name = "rwget"
+path = "src/main.rs"
+
+[dependencies]
+rwget-core.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+dirs.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+nng.workspace = true
+which.workspace = true
+clap.workspace = true
+clap_complete.workspace = true
+
+[build-dependencies]
+clap.workspace = true
+clap_complete.workspace = true
+clap_mangen.workspace = true
