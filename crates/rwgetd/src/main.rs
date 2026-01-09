@@ -4,11 +4,18 @@
 //! - Stage 2: Impersonation requests with browser TLS/HTTP2 fingerprints
 //! - Stage 3: JS preflight with headless Chromium
 
+use mimalloc::MiMalloc;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
+
 mod server;
 mod impersonate;
 mod preflight;
 
 use anyhow::Result;
+use std::sync::Arc;
+use tokio::runtime::Runtime;
 use tracing::{info, Level};
 use tracing_subscriber::FmtSubscriber;
 
@@ -21,6 +28,10 @@ fn main() -> Result<()> {
 
     info!("rwgetd {} starting", env!("CARGO_PKG_VERSION"));
 
-    // Run the server
-    server::run()
+    // Create persistent tokio runtime (shared across all requests)
+    let runtime = Arc::new(Runtime::new()?);
+    info!("Tokio runtime initialized");
+
+    // Run the server with shared runtime
+    server::run(runtime)
 }

@@ -5,10 +5,66 @@
 use rquest::Client;
 use rquest_util::Emulation;
 use rwget_core::{analyze_body, Request, Response};
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
+use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
+use tokio::runtime::Runtime;
 use tracing::{debug, info, warn};
+
+/// Client pool for reusing HTTP clients with different browser profiles
+///
+/// Note: rquest::Client has Emulation set at build time, so we need one
+/// client per profile. Clients are safe to clone and share.
+pub struct ClientPool {
+    clients: Mutex<HashMap<String, Client>>,
+}
+
+impl ClientPool {
+    pub fn new() -> Self {
+        Self {
+            clients: Mutex::new(HashMap::new()),
+        }
+    }
+
+    /// Get or create a client for the given profile
+    ///
+    /// Note: We don't set timeout here because it's request-specific.
+    /// Use tokio::time::timeout() wrapper for per-request timeout.
+    pub fn get_or_create(&self, profile: Option<&str>) -> Result<Client, String> {
+        let profile_name = profile.unwrap_or("chrome131");
+
+        // Check if client exists
+        {
+            let clients = self.clients.lock().unwrap();
+            if let Some(client) = clients.get(profile_name) {
+                return Ok(client.clone());
+            }
+        }
+
+        // Create new client (no timeout - handled per-request)
+        let emulation = get_emulation(profile);
+        let client = Client::builder()
+            .emulation(emulation)
+            .build()
+            .map_err(|e| format!("Failed to create client: {}", e))?;
+
+        // Store and return
+        let mut clients = self.clients.lock().unwrap();
+        clients.insert(profile_name.to_string(), client.clone());
+        debug!("Created new client for profile: {}", profile_name);
+
+        Ok(client)
+    }
+}
+
+/// Global client pool (lazy initialized)
+static CLIENT_POOL: OnceLock<ClientPool> = OnceLock::new();
+
+fn get_client_pool() -> &'static ClientPool {
+    CLIENT_POOL.get_or_init(|| ClientPool::new())
+}
 
 /// Available browser profiles
 pub fn available_profiles() -> Vec<String> {
@@ -47,33 +103,24 @@ fn get_emulation(profile: Option<&str>) -> Emulation {
     }
 }
 
-/// Perform an impersonated HTTP request
-pub fn fetch(request: Request) -> Response {
-    let runtime = match tokio::runtime::Runtime::new() {
-        Ok(rt) => rt,
-        Err(e) => return Response::error(request.id, &format!("Failed to create runtime: {}", e)),
-    };
-
+/// Perform an impersonated HTTP request using shared runtime
+pub fn fetch(request: Request, runtime: &Arc<Runtime>) -> Response {
     runtime.block_on(async { fetch_async(request).await })
 }
 
 async fn fetch_async(request: Request) -> Response {
-    let emulation = get_emulation(request.profile.as_deref());
     let profile_name = request.profile.as_deref().unwrap_or("chrome131");
+    let timeout_duration = Duration::from_millis(request.timeout_ms);
 
     info!(
         "Stage 2 request: {} {} (profile: {})",
         request.method, request.url, profile_name
     );
 
-    // Build the client with emulation (browser fingerprint impersonation)
-    let client = match Client::builder()
-        .emulation(emulation)
-        .timeout(Duration::from_millis(request.timeout_ms))
-        .build()
-    {
+    // Get pooled client (no timeout configured - we handle it per-request)
+    let client = match get_client_pool().get_or_create(request.profile.as_deref()) {
         Ok(c) => c,
-        Err(e) => return Response::error(request.id, &format!("Failed to create client: {}", e)),
+        Err(e) => return Response::error(request.id, &e),
     };
 
     // Build the request
@@ -96,12 +143,18 @@ async fn fetch_async(request: Request) -> Response {
         req_builder = req_builder.body(body);
     }
 
-    // Execute the request
-    let resp = match req_builder.send().await {
-        Ok(r) => r,
-        Err(e) => {
+    // Execute the request with timeout wrapper
+    let result = tokio::time::timeout(timeout_duration, req_builder.send()).await;
+
+    let resp = match result {
+        Ok(Ok(r)) => r,
+        Ok(Err(e)) => {
             warn!("Request failed: {}", e);
             return Response::error(request.id, &format!("Request failed: {}", e));
+        }
+        Err(_) => {
+            warn!("Request timeout after {:?}", timeout_duration);
+            return Response::error(request.id, &format!("Request timeout after {:?}", timeout_duration));
         }
     };
 
@@ -119,12 +172,21 @@ async fn fetch_async(request: Request) -> Response {
     // Check if blocked by status code
     let blocked_by_status = matches!(status, 403 | 429 | 503 | 520..=529);
 
-    // Get the body
-    let body_bytes = match resp.bytes().await {
-        Ok(b) => b.to_vec(),
-        Err(e) => {
+    // Get the body (also with timeout for large responses)
+    let body_result = tokio::time::timeout(
+        Duration::from_secs(60), // Body read timeout
+        resp.bytes()
+    ).await;
+
+    let body_bytes = match body_result {
+        Ok(Ok(b)) => b.to_vec(),
+        Ok(Err(e)) => {
             warn!("Failed to read body: {}", e);
             return Response::error(request.id, &format!("Failed to read body: {}", e));
+        }
+        Err(_) => {
+            warn!("Body read timeout");
+            return Response::error(request.id, "Body read timeout");
         }
     };
 
@@ -204,5 +266,12 @@ mod tests {
     fn test_get_emulation_firefox() {
         let emu = get_emulation(Some("firefox136"));
         assert!(matches!(emu, Emulation::Firefox136));
+    }
+
+    #[test]
+    fn test_client_pool_new() {
+        let pool = ClientPool::new();
+        let clients = pool.clients.lock().unwrap();
+        assert!(clients.is_empty());
     }
 }

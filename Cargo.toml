@@ -68,5 +68,8 @@ ureq = "2.9"
 base64 = "0.22"
 sha2 = "0.10"
 
+# Memory allocator
+mimalloc = "0.1"
+
 # Internal crates
 rwget-core = { path = "crates/rwget-core" }

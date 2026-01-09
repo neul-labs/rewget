@@ -12,7 +12,9 @@ use rwget_core::{chromium_installed, chromium_path, download_chromium, Request, 
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
+use std::sync::Arc;
 use std::time::Duration;
+use tokio::runtime::Runtime;
 use tracing::{debug, info, warn};
 
 /// Default wait time for JS challenges (5 seconds)
@@ -21,9 +23,9 @@ const DEFAULT_JS_WAIT_MS: u64 = 5000;
 /// Maximum wait time for page load (30 seconds)
 const MAX_PAGE_LOAD_MS: u64 = 30000;
 
-/// Perform a JS preflight request
-pub fn fetch(request: Request) -> Response {
-    // Auto-download Chromium if not installed
+/// Perform a JS preflight request using shared runtime
+pub fn fetch(request: Request, runtime: &Arc<Runtime>) -> Response {
+    // Auto-download Chromium if not installed (blocking operation)
     if !chromium_installed() {
         info!("Chromium not installed, downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
         eprintln!("[rwget] Downloading Chrome for Testing v{} (~150MB, one-time setup)...", CHROMIUM_VERSION);
@@ -40,11 +42,6 @@ pub fn fetch(request: Request) -> Response {
         eprintln!("[rwget] Chromium installed successfully");
         info!("Chromium installed at: {}", chromium_path().display());
     }
-
-    let runtime = match tokio::runtime::Runtime::new() {
-        Ok(rt) => rt,
-        Err(e) => return Response::error(request.id, &format!("Failed to create runtime: {}", e)),
-    };
 
     runtime.block_on(async { fetch_async(request).await })
 }

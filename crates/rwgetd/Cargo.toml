@@ -22,3 +22,4 @@ rquest.workspace = true
 rquest-util.workspace = true
 chromiumoxide.workspace = true
 futures.workspace = true
+mimalloc.workspace = true

@@ -1,5 +1,10 @@
 //! rwget - wget-compatible wrapper with automatic fallback
 
+use mimalloc::MiMalloc;
+
+#[global_allocator]
+static GLOBAL: MiMalloc = MiMalloc;
+
 mod args;
 mod cli;
 mod daemon;
