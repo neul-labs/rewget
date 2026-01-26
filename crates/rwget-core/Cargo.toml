@@ -3,7 +3,14 @@ name = "rwget-core"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+authors.workspace = true
+readme = "../../README.md"
 description = "Shared library for rwget"
+keywords = ["wget", "http", "download"]
+categories = ["network-programming"]
 
 [dependencies]
 thiserror.workspace = true

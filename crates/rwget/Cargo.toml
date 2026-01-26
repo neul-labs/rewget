@@ -3,7 +3,14 @@ name = "rwget"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+repository.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+authors.workspace = true
+readme = "../../README.md"
 description = "wget-compatible wrapper with automatic fallback"
+keywords = ["wget", "http", "download", "cli"]
+categories = ["command-line-utilities", "network-programming"]
 
 [[bin]]
 name = "rwget"
