@@ -1,10 +1,10 @@
-//! Configuration for rwget
+//! Configuration for rewget
 
 use crate::Engine;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
-/// Runtime configuration for rwget
+/// Runtime configuration for rewget
 #[derive(Debug, Clone)]
 pub struct Config {
     /// Selected wget engine
@@ -19,7 +19,7 @@ pub struct Config {
     /// Enable body pattern detection
     pub body_detection: bool,
 
-    /// Suppress rwget messages
+    /// Suppress rewget messages
     pub quiet: bool,
 
     /// Enable debug output
@@ -167,7 +167,7 @@ fn default_profile() -> String { "chrome".to_string() }
 impl ConfigFile {
     /// Get config directory path
     pub fn config_dir() -> Option<PathBuf> {
-        dirs::config_dir().map(|p| p.join("rwget"))
+        dirs::config_dir().map(|p| p.join("rewget"))
     }
 
     /// Get config file path

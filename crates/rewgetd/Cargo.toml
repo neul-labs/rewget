@@ -1,5 +1,5 @@
 [package]
-name = "rwgetd"
+name = "rewgetd"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -8,16 +8,16 @@ documentation.workspace = true
 homepage.workspace = true
 authors.workspace = true
 readme = "../../README.md"
-description = "Daemon for rwget Stage 2/3 execution"
+description = "Daemon for rewget Stage 2/3 execution"
 keywords = ["wget", "http", "download", "daemon"]
 categories = ["command-line-utilities", "network-programming"]
 
 [[bin]]
-name = "rwgetd"
+name = "rewgetd"
 path = "src/main.rs"
 
 [dependencies]
-rwget-core.workspace = true
+rewget-core.workspace = true
 anyhow.workspace = true
 tokio.workspace = true
 tracing.workspace = true

@@ -1,31 +1,31 @@
 # Quick Start
 
-Get up and running with rwget in 5 minutes.
+Get up and running with rewget in 5 minutes.
 
 ## Basic Download
 
-rwget works exactly like wget:
+rewget works exactly like wget:
 
 ```bash
 # Download a file
-rwget https://example.com/file.tar.gz
+rewget https://example.com/file.tar.gz
 
 # Download with output filename
-rwget -O myfile.tar.gz https://example.com/file.tar.gz
+rewget -O myfile.tar.gz https://example.com/file.tar.gz
 
 # Download to specific directory
-rwget -P ./downloads/ https://example.com/file.tar.gz
+rewget -P ./downloads/ https://example.com/file.tar.gz
 ```
 
 ## Automatic Fallback in Action
 
-When a site blocks your request, rwget automatically retries:
+When a site blocks your request, rewget automatically retries:
 
 ```bash
-$ rwget https://protected-site.com/data.json
+$ rewget https://protected-site.com/data.json
 
-[rwget] 403 Forbidden - retrying with impersonation...
-[rwget] Success at Stage 2 (chrome_131)
+[rewget] 403 Forbidden - retrying with impersonation...
+[rewget] Success at Stage 2 (chrome_131)
 ```
 
 The fallback happens automatically - no configuration needed.
@@ -37,7 +37,7 @@ The fallback happens automatically - no configuration needed.
 Most protected sites work automatically:
 
 ```bash
-rwget https://cloudflare-protected.com/file.zip
+rewget https://cloudflare-protected.com/file.zip
 ```
 
 ### Force Browser Mode
@@ -45,7 +45,7 @@ rwget https://cloudflare-protected.com/file.zip
 Skip straight to JavaScript preflight for heavily protected sites:
 
 ```bash
-rwget --rwget-js https://heavily-protected.com/
+rewget --rewget-js https://heavily-protected.com/
 ```
 
 ### Strict Mode (No Fallback)
@@ -53,17 +53,17 @@ rwget --rwget-js https://heavily-protected.com/
 For scripts where you want predictable behavior:
 
 ```bash
-rwget --rwget-no-fallback https://example.com/file.tar.gz
+rewget --rewget-no-fallback https://example.com/file.tar.gz
 ```
 
 This exits with wget's original error code if blocked.
 
 ### Quiet Mode
 
-Suppress rwget status messages:
+Suppress rewget status messages:
 
 ```bash
-rwget --rwget-quiet https://example.com/file.tar.gz
+rewget --rewget-quiet https://example.com/file.tar.gz
 ```
 
 ### Debug Mode
@@ -71,7 +71,7 @@ rwget --rwget-quiet https://example.com/file.tar.gz
 See detailed information about what's happening:
 
 ```bash
-rwget --rwget-debug https://example.com/file.tar.gz
+rewget --rewget-debug https://example.com/file.tar.gz
 ```
 
 ## Using wget Options
@@ -80,19 +80,19 @@ All wget options work unchanged:
 
 ```bash
 # Resume interrupted download
-rwget -c https://example.com/large-file.iso
+rewget -c https://example.com/large-file.iso
 
 # Limit download speed
-rwget --limit-rate=1M https://example.com/file.tar.gz
+rewget --limit-rate=1M https://example.com/file.tar.gz
 
 # Set user agent (Stage 1 only)
-rwget --user-agent="MyApp/1.0" https://example.com/
+rewget --user-agent="MyApp/1.0" https://example.com/
 
 # Follow redirects
-rwget --max-redirect=5 https://example.com/
+rewget --max-redirect=5 https://example.com/
 
 # Download recursively
-rwget -r -l 2 https://example.com/docs/
+rewget -r -l 2 https://example.com/docs/
 ```
 
 ## Check Available Profiles
@@ -100,7 +100,7 @@ rwget -r -l 2 https://example.com/docs/
 See what browser profiles are available:
 
 ```bash
-$ rwget --rwget-list-profiles
+$ rewget --rewget-list-profiles
 
 Available browser profiles:
 
@@ -120,7 +120,7 @@ Available browser profiles:
 Request impersonation with a specific browser:
 
 ```bash
-rwget --rwget-profile=firefox_136 https://example.com/
+rewget --rewget-profile=firefox_136 https://example.com/
 ```
 
 ## View Cache Status
@@ -128,27 +128,27 @@ rwget --rwget-profile=firefox_136 https://example.com/
 See which domains have cached stages:
 
 ```bash
-# The cache is stored at ~/.cache/rwget/stage-cache.json
-cat ~/.cache/rwget/stage-cache.json
+# The cache is stored at ~/.cache/rewget/stage-cache.json
+cat ~/.cache/rewget/stage-cache.json
 ```
 
 Clear the cache:
 
 ```bash
-rwget --rwget-clear-cache
+rewget --rewget-clear-cache
 ```
 
 ## Summary of Key Flags
 
 | Flag | Description |
 |------|-------------|
-| `--rwget-no-fallback` | Disable fallback, behave like wget |
-| `--rwget-quiet` | Suppress rwget messages |
-| `--rwget-debug` | Enable debug output |
-| `--rwget-js` | Force JavaScript preflight |
-| `--rwget-profile=NAME` | Use specific browser profile |
-| `--rwget-list-profiles` | List available profiles |
-| `--rwget-clear-cache` | Clear domain stage cache |
+| `--rewget-no-fallback` | Disable fallback, behave like wget |
+| `--rewget-quiet` | Suppress rewget messages |
+| `--rewget-debug` | Enable debug output |
+| `--rewget-js` | Force JavaScript preflight |
+| `--rewget-profile=NAME` | Use specific browser profile |
+| `--rewget-list-profiles` | List available profiles |
+| `--rewget-clear-cache` | Clear domain stage cache |
 
 ## Next Steps
 

@@ -8,7 +8,7 @@
 
 use chromiumoxide::browser::{Browser, BrowserConfig};
 use futures::StreamExt;
-use rwget_core::{chromium_installed, chromium_path, download_chromium, Request, Response, CHROMIUM_VERSION};
+use rewget_core::{chromium_installed, chromium_path, download_chromium, Request, Response, CHROMIUM_VERSION};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
@@ -28,18 +28,18 @@ pub fn fetch(request: Request, runtime: &Arc<Runtime>) -> Response {
     // Auto-download Chromium if not installed (blocking operation)
     if !chromium_installed() {
         info!("Chromium not installed, downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
-        eprintln!("[rwget] Downloading Chrome for Testing v{} (~150MB, one-time setup)...", CHROMIUM_VERSION);
+        eprintln!("[rewget] Downloading Chrome for Testing v{} (~150MB, one-time setup)...", CHROMIUM_VERSION);
 
         if let Err(e) = download_chromium(|_downloaded, _total| {
             // Progress is shown by wget/curl
         }) {
             return Response::error(
                 request.id,
-                &format!("Failed to download Chromium: {}. You can manually run: rwget --rwget-download-chromium", e),
+                &format!("Failed to download Chromium: {}. You can manually run: rewget --rewget-download-chromium", e),
             );
         }
 
-        eprintln!("[rwget] Chromium installed successfully");
+        eprintln!("[rewget] Chromium installed successfully");
         info!("Chromium installed at: {}", chromium_path().display());
     }
 
@@ -161,9 +161,9 @@ async fn fetch_async(request: Request) -> Response {
     debug!("Got {} cookies", cookies.len());
 
     // Check for blocking patterns in content
-    let blocked = rwget_core::analyze_body(&content, &[]).is_some();
+    let blocked = rewget_core::analyze_body(&content, &[]).is_some();
     let block_reason = if blocked {
-        rwget_core::analyze_body(&content, &[]).map(|r| format!("{}", r))
+        rewget_core::analyze_body(&content, &[]).map(|r| format!("{}", r))
     } else {
         None
     };

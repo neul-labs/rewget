@@ -1,4 +1,4 @@
-//! Browser profile management for rwget
+//! Browser profile management for rewget
 //!
 //! Profiles define browser fingerprints (TLS, HTTP/2, headers) for impersonation.
 //! Supports remote profile updates with Ed25519 signature verification.
@@ -13,7 +13,7 @@ use std::fs;
 use std::path::PathBuf;
 
 /// Default profile update URL
-pub const DEFAULT_PROFILE_URL: &str = "https://rwget.dev/profiles/v1/index.json";
+pub const DEFAULT_PROFILE_URL: &str = "https://rewget.dev/profiles/v1/index.json";
 
 /// Ed25519 public key for profile verification (base64 encoded)
 /// This key is used to verify that profiles come from a trusted source.
@@ -147,7 +147,7 @@ impl ProfileCollection {
     pub fn profiles_dir() -> PathBuf {
         dirs::data_dir()
             .unwrap_or_else(|| PathBuf::from(".local/share"))
-            .join("rwget")
+            .join("rewget")
             .join("profiles")
     }
 
@@ -322,7 +322,7 @@ impl ProfileCollection {
         if verify {
             if !remote.verify_signature(PROFILE_PUBLIC_KEY)? {
                 return Err(crate::Error::Config(
-                    "Profile signature verification failed. Use --rwget-no-verify to skip.".to_string()
+                    "Profile signature verification failed. Use --rewget-no-verify to skip.".to_string()
                 ));
             }
         }
@@ -739,6 +739,6 @@ mod tests {
     #[test]
     fn test_profiles_dir() {
         let dir = ProfileCollection::profiles_dir();
-        assert!(dir.to_string_lossy().contains("rwget"));
+        assert!(dir.to_string_lossy().contains("rewget"));
     }
 }

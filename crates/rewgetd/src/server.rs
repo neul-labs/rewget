@@ -1,9 +1,9 @@
-//! nng IPC server for rwgetd
+//! nng IPC server for rewgetd
 
 use anyhow::{Context, Result};
 use nng::options::Options;
 use nng::{Protocol, Socket};
-use rwget_core::{socket_path, Request, Response, DaemonStatus};
+use rewget_core::{socket_path, Request, Response, DaemonStatus};
 use std::fs;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -128,7 +128,7 @@ fn handle_request(request: Request, runtime: &Arc<Runtime>) -> Response {
 
 /// Handle a status request
 fn handle_status() -> Response {
-    let chromium_status = rwget_core::ChromiumStatus::check();
+    let chromium_status = rewget_core::ChromiumStatus::check();
 
     let status = DaemonStatus {
         version: env!("CARGO_PKG_VERSION").to_string(),

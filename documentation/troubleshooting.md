@@ -1,19 +1,19 @@
 # Troubleshooting
 
-Solutions to common issues with rwget.
+Solutions to common issues with rewget.
 
 ## Installation Issues
 
-### "command not found: rwget"
+### "command not found: rewget"
 
-The rwget binary is not in your PATH.
+The rewget binary is not in your PATH.
 
 **Solution:**
 
 === "Homebrew"
 
     ```bash
-    brew link rwget
+    brew link rewget
     ```
 
 === "Manual Install"
@@ -28,7 +28,7 @@ The rwget binary is not in your PATH.
 
 ### "wget not found"
 
-rwget requires wget to be installed.
+rewget requires wget to be installed.
 
 **Solution:**
 
@@ -95,7 +95,7 @@ sudo iptables -L
 
 ```bash
 # Skip certificate verification (not recommended for production)
-rwget --no-check-certificate https://example.com/
+rewget --no-check-certificate https://example.com/
 
 # Or update CA certificates
 sudo apt update && sudo apt install ca-certificates
@@ -108,9 +108,9 @@ sudo apt update && sudo apt install ca-certificates
 Increase timeouts:
 
 ```bash
-rwget --rwget-timeout-stage1=60000 \
-      --rwget-timeout-stage2=60000 \
-      --rwget-timeout-stage3=120000 \
+rewget --rewget-timeout-stage1=60000 \
+      --rewget-timeout-stage2=60000 \
+      --rewget-timeout-stage3=120000 \
       https://slow-site.com/
 ```
 
@@ -124,32 +124,32 @@ Some sites have very aggressive bot detection that even Stage 3 can't bypass.
 
 1. Try a different profile:
    ```bash
-   rwget --rwget-profile=firefox_136 https://example.com/
+   rewget --rewget-profile=firefox_136 https://example.com/
    ```
 
 2. Force Stage 3 with wait:
    ```bash
-   rwget --rwget-js --rwget-js-wait=delay:10000 https://example.com/
+   rewget --rewget-js --rewget-js-wait=delay:10000 https://example.com/
    ```
 
 3. Check if the site actually allows access (some block all automated access)
 
 ### "Stage 2 failed, trying Stage 3..."
 
-This is normal behavior - Stage 2 (impersonation) didn't work, so rwget tries Stage 3 (browser).
+This is normal behavior - Stage 2 (impersonation) didn't work, so rewget tries Stage 3 (browser).
 
 If Stage 3 also fails, the site may have additional protections.
 
 ### Fallback Not Triggering
 
-rwget only retries on specific status codes. Check your fallback codes:
+rewget only retries on specific status codes. Check your fallback codes:
 
 ```bash
 # See what codes trigger fallback (default: 403,429,503,520-529)
-rwget --rwget-debug https://example.com/
+rewget --rewget-debug https://example.com/
 
 # Add additional codes
-rwget --rwget-fallback-codes=403,429,503,500 https://example.com/
+rewget --rewget-fallback-codes=403,429,503,500 https://example.com/
 ```
 
 ### Cache Issues
@@ -158,10 +158,10 @@ If a site starts blocking after previously working:
 
 ```bash
 # Clear the domain cache
-rwget --rwget-clear-cache
+rewget --rewget-clear-cache
 
 # Disable caching for this request
-rwget --rwget-no-cache https://example.com/
+rewget --rewget-no-cache https://example.com/
 ```
 
 ## Daemon Issues
@@ -174,14 +174,14 @@ The daemon isn't running or crashed.
 
 ```bash
 # Check if daemon is running
-pgrep rwgetd
+pgrep rewgetd
 
-# Restart by killing and letting rwget respawn
-pkill rwgetd
-rwget https://example.com/
+# Restart by killing and letting rewget respawn
+pkill rewgetd
+rewget https://example.com/
 
 # Check daemon logs
-rwget --rwget-debug https://example.com/
+rewget --rewget-debug https://example.com/
 ```
 
 ### "Daemon startup timeout"
@@ -192,13 +192,13 @@ The daemon is taking too long to start.
 
 ```bash
 # Kill any stale daemon
-pkill -9 rwgetd
+pkill -9 rewgetd
 
 # Remove socket file
-rm ~/.cache/rwget/rwgetd.sock
+rm ~/.cache/rewget/rewgetd.sock
 
 # Try again
-rwget https://example.com/
+rewget https://example.com/
 ```
 
 ### High Memory Usage
@@ -209,7 +209,7 @@ The daemon caches browser sessions which can use memory.
 
 ```bash
 # Kill daemon to free memory
-pkill rwgetd
+pkill rewgetd
 
 # It will restart automatically when needed
 ```
@@ -224,7 +224,7 @@ pkill rwgetd
 2. Ensure ~150MB disk space is available
 3. Try manual download:
    ```bash
-   rwget --rwget-download-chromium
+   rewget --rewget-download-chromium
    ```
 
 ### "Chromium not found" After Download
@@ -233,11 +233,11 @@ pkill rwgetd
 
 ```bash
 # Check installation path
-rwget --rwget-chromium-path
+rewget --rewget-chromium-path
 
 # Re-download if needed
-rm -rf ~/.local/share/rwget/chromium/
-rwget --rwget-download-chromium
+rm -rf ~/.local/share/rewget/chromium/
+rewget --rewget-download-chromium
 ```
 
 ### Stage 3 Hangs
@@ -248,10 +248,10 @@ The browser might be stuck on a page.
 
 ```bash
 # Use a specific wait condition
-rwget --rwget-js --rwget-js-wait=delay:5000 https://example.com/
+rewget --rewget-js --rewget-js-wait=delay:5000 https://example.com/
 
 # Reduce timeout
-rwget --rwget-js --rwget-timeout-stage3=15000 https://example.com/
+rewget --rewget-js --rewget-timeout-stage3=15000 https://example.com/
 ```
 
 ### "Chrome failed to start"
@@ -289,10 +289,10 @@ rwget --rwget-js --rwget-timeout-stage3=15000 https://example.com/
 
 ```bash
 # List available profiles
-rwget --rwget-list-profiles
+rewget --rewget-list-profiles
 
 # Use exact profile name
-rwget --rwget-profile=chrome_131 https://example.com/
+rewget --rewget-profile=chrome_131 https://example.com/
 ```
 
 ### "Profile update failed"
@@ -301,10 +301,10 @@ rwget --rwget-profile=chrome_131 https://example.com/
 
 ```bash
 # Check network connectivity
-curl -v https://rwget.dev/profiles/v1/index.json
+curl -v https://rewget.dev/profiles/v1/index.json
 
 # Reset to built-in defaults
-rwget --rwget-update-profiles
+rewget --rewget-update-profiles
 # (Falls back to defaults on failure)
 ```
 
@@ -316,14 +316,14 @@ The profile source may be compromised or the file is corrupted.
 
 1. Try updating again:
    ```bash
-   rwget --rwget-update-profiles
+   rewget --rewget-update-profiles
    ```
 
 2. If using custom URL, verify the source is trustworthy
 
 3. Skip verification (only if you trust the source):
    ```bash
-   rwget --rwget-no-verify --rwget-update-profiles
+   rewget --rewget-no-verify --rewget-update-profiles
    ```
 
 ## Debug Mode
@@ -331,7 +331,7 @@ The profile source may be compromised or the file is corrupted.
 When reporting issues, include debug output:
 
 ```bash
-rwget --rwget-debug https://example.com/ 2>&1 | tee rwget-debug.log
+rewget --rewget-debug https://example.com/ 2>&1 | tee rewget-debug.log
 ```
 
 This shows:
@@ -346,12 +346,12 @@ This shows:
 
 If you can't resolve an issue:
 
-1. Check existing [GitHub Issues](https://github.com/dipankardas011/rwget/issues)
+1. Check existing [GitHub Issues](https://github.com/dipankardas011/rewget/issues)
 
 2. Create a new issue with:
-   - rwget version (`rwget --rwget-version`)
+   - rewget version (`rewget --rewget-version`)
    - Operating system
-   - Debug output (`--rwget-debug`)
+   - Debug output (`--rewget-debug`)
    - Steps to reproduce
 
-3. For security issues, email security@rwget.dev instead of creating a public issue.
+3. For security issues, email security@rewget.dev instead of creating a public issue.

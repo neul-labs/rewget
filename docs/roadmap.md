@@ -1,16 +1,16 @@
 # Roadmap
 
-This document outlines the implementation phases for rwget. Each phase builds on the previous and has clear deliverables.
+This document outlines the implementation phases for rewget. Each phase builds on the previous and has clear deliverables.
 
 ## Current Status (January 2026)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  rwget v1.0.0 - All Phases Complete                         │
+│  rewget v1.0.0 - All Phases Complete                         │
 ├─────────────────────────────────────────────────────────────┤
 │  ✅ Phase 0: Foundation           - CLI, args, engine       │
 │  ✅ Phase 1: Failure Detection    - 403/429/503 detection   │
-│  ✅ Phase 2: Daemon Infrastructure - nng IPC, rwgetd        │
+│  ✅ Phase 2: Daemon Infrastructure - nng IPC, rewgetd        │
 │  ✅ Phase 3: Impersonation        - TLS/HTTP2 fingerprints  │
 │  ✅ Phase 4: JS Preflight         - Headless Chromium       │
 │  ✅ Phase 5: Profile Updates      - Ed25519 signed updates  │
@@ -18,7 +18,7 @@ This document outlines the implementation phases for rwget. Each phase builds on
 │  ✅ Phase 7: Polish & 1.0         - Shell completions, man  │
 ├─────────────────────────────────────────────────────────────┤
 │  Tests: 42 passing | Platforms: 5 targets | Profiles: 6    │
-│  Binary: rwget 3.3MB, rwgetd 9.5MB (with LTO)               │
+│  Binary: rewget 3.3MB, rewgetd 9.5MB (with LTO)               │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -30,7 +30,7 @@ This document outlines the implementation phases for rwget. Each phase builds on
 | Browser profiles | Chrome 131/130, Firefox 136/133, Safari 18, Edge 131 |
 | Domain caching | 7-day TTL per-domain stage memory |
 | Auto Chromium | Downloads Chrome for Testing (~150MB) on first use |
-| Remote updates | `--rwget-update-profiles` with Ed25519 verification |
+| Remote updates | `--rewget-update-profiles` with Ed25519 verification |
 | Cross-platform | Linux x64/arm64, macOS x64/arm64, Windows x64 |
 | CI/CD | GitHub Actions for all platforms |
 
@@ -42,17 +42,17 @@ This document outlines the implementation phases for rwget. Each phase builds on
 
 ### Deliverables
 
-- [x] `rwget` binary that parses `--rwget-*` flags
-- [x] `--rwget-no-fallback` exec's wget directly (zero overhead)
-- [x] `--rwget-engine=wget|wget2` flag
-- [x] `--rwget-version` and `--rwget-help`
+- [x] `rewget` binary that parses `--rewget-*` flags
+- [x] `--rewget-no-fallback` exec's wget directly (zero overhead)
+- [x] `--rewget-engine=wget|wget2` flag
+- [x] `--rewget-version` and `--rewget-help`
 - [x] Strict mode golden tests passing on Linux
 
 ### Technical Tasks
 
-1. ✅ Set up Rust project structure (`rwget`, `rwgetd`, `rwget-core`)
-2. ✅ Implement argument parser that separates `--rwget-*` from wget flags
-3. ✅ Implement exec path for `--rwget-no-fallback`
+1. ✅ Set up Rust project structure (`rewget`, `rewgetd`, `rewget-core`)
+2. ✅ Implement argument parser that separates `--rewget-*` from wget flags
+3. ✅ Implement exec path for `--rewget-no-fallback`
 4. ⏭️ Bundle `wget_engine` (using system wget for now)
 5. ⏭️ Bundle `wget2_engine` (using system wget2 for now)
 6. ✅ Implement engine selection logic
@@ -63,22 +63,22 @@ This document outlines the implementation phases for rwget. Each phase builds on
 
 ```bash
 # Default: wget
-rwget https://example.com/file.txt
+rewget https://example.com/file.txt
 
 # Explicit wget2
-rwget --rwget-engine=wget2 https://example.com/file.txt
+rewget --rewget-engine=wget2 https://example.com/file.txt
 
 # Environment variable
-RWGET_ENGINE=wget2 rwget https://example.com/file.txt
+RWGET_ENGINE=wget2 rewget https://example.com/file.txt
 ```
 
 ### Exit Criteria
 
 ```bash
-rwget --rwget-no-fallback https://example.com/file.txt
+rewget --rewget-no-fallback https://example.com/file.txt
 # Identical to: wget https://example.com/file.txt
 
-rwget --rwget-no-fallback --rwget-engine=wget2 https://example.com/file.txt
+rewget --rewget-no-fallback --rewget-engine=wget2 https://example.com/file.txt
 # Identical to: wget2 https://example.com/file.txt
 ```
 
@@ -93,8 +93,8 @@ rwget --rwget-no-fallback --rwget-engine=wget2 https://example.com/file.txt
 - [x] Spawn wget as subprocess (not exec) in default mode
 - [x] Capture exit code and detect 403/429/503
 - [x] Buffer small HTML responses for body pattern detection
-- [x] `--rwget-fallback-codes` configuration
-- [x] `--rwget-no-body-detection` flag
+- [x] `--rewget-fallback-codes` configuration
+- [x] `--rewget-no-body-detection` flag
 - [x] Fallback messages to stderr
 
 ### Technical Tasks
@@ -102,14 +102,14 @@ rwget --rwget-no-fallback --rwget-engine=wget2 https://example.com/file.txt
 1. ✅ Implement subprocess spawning with output capture
 2. ✅ Parse wget exit codes to HTTP status mapping
 3. ✅ Implement body pattern matching (Cloudflare signatures, etc.)
-4. ✅ Add `--rwget-quiet` flag
+4. ✅ Add `--rewget-quiet` flag
 5. ✅ Add fallback message formatting
 
 ### Exit Criteria
 
 ```bash
-rwget https://protected-site.com/
-# [rwget] 403 Forbidden - would retry with impersonation...
+rewget https://protected-site.com/
+# [rewget] 403 Forbidden - would retry with impersonation...
 # (exits with wget's exit code, no actual retry yet)
 ```
 
@@ -121,15 +121,15 @@ rwget https://protected-site.com/
 
 ### Deliverables
 
-- [x] `rwgetd` binary with nng IPC
-- [x] Inline daemon spawning from `rwget`
+- [x] `rewgetd` binary with nng IPC
+- [x] Inline daemon spawning from `rewget`
 - [x] Stage 2/3 RPC handlers
 - [ ] Idle timeout auto-shutdown
-- [x] `--rwget-daemon=auto|on|off`
+- [x] `--rewget-daemon=auto|on|off`
 
 ### Technical Tasks
 
-1. ✅ Implement `rwgetd` with nng listener
+1. ✅ Implement `rewgetd` with nng listener
 2. ✅ Define JSON schema for RPC (Request/Response in ipc.rs)
 3. ✅ Implement Stage 2/3 handlers
 4. ✅ Implement client-side daemon spawning
@@ -139,7 +139,7 @@ rwget https://protected-site.com/
 ### Exit Criteria
 
 ```bash
-rwget --rwget-daemon=on https://example.com/file.txt
+rewget --rewget-daemon=on https://example.com/file.txt
 # Works identically to direct wget, but via daemon
 ```
 
@@ -154,11 +154,11 @@ rwget --rwget-daemon=on https://example.com/file.txt
 - [x] Custom TLS client with configurable fingerprint (via rquest)
 - [x] Custom HTTP/2 client with configurable SETTINGS (via rquest)
 - [x] Profile JSON format and bundled profiles
-- [x] `--rwget-profile` flag
-- [x] `--rwget-list-profiles`
+- [x] `--rewget-profile` flag
+- [x] `--rewget-list-profiles`
 - [x] Stage 1 → Stage 2 automatic fallback
 - [x] Domain-level stage caching
-- [x] `--rwget-no-cache` and `--rwget-clear-cache` flags
+- [x] `--rewget-no-cache` and `--rewget-clear-cache` flags
 
 ### Technical Tasks
 
@@ -179,18 +179,18 @@ When Stage 2 succeeds for a domain, cache it to skip Stage 1 on future requests:
 
 ```bash
 # First request: tries Stage 1, fails, Stage 2 succeeds
-rwget https://protected.example.com/file1.txt
-# [rwget] 403 Forbidden - retrying with impersonation...
-# [rwget] Success at Stage 2 (chrome_120)
-# [rwget] Cached: protected.example.com → Stage 2
+rewget https://protected.example.com/file1.txt
+# [rewget] 403 Forbidden - retrying with impersonation...
+# [rewget] Success at Stage 2 (chrome_120)
+# [rewget] Cached: protected.example.com → Stage 2
 
 # Second request: starts at Stage 2
-rwget https://protected.example.com/file2.txt
-# [rwget] Using cached Stage 2 for protected.example.com
-# [rwget] Success at Stage 2 (chrome_120)
+rewget https://protected.example.com/file2.txt
+# [rewget] Using cached Stage 2 for protected.example.com
+# [rewget] Success at Stage 2 (chrome_120)
 ```
 
-Cache stored in `~/.cache/rwget/stage-cache.json`:
+Cache stored in `~/.cache/rewget/stage-cache.json`:
 ```json
 {
   "protected.example.com": {"stage": 2, "profile": "chrome_120", "expires": 1704067200},
@@ -199,15 +199,15 @@ Cache stored in `~/.cache/rwget/stage-cache.json`:
 ```
 
 Flags:
-- `--rwget-no-cache`: Disable stage caching, always start at Stage 1
-- `--rwget-clear-cache`: Clear the stage cache
+- `--rewget-no-cache`: Disable stage caching, always start at Stage 1
+- `--rewget-clear-cache`: Clear the stage cache
 
 ### Exit Criteria
 
 ```bash
-rwget https://cloudflare-protected-site.com/
-# [rwget] 403 Forbidden - retrying with impersonation...
-# [rwget] Success at Stage 2 (chrome_120)
+rewget https://cloudflare-protected-site.com/
+# [rewget] 403 Forbidden - retrying with impersonation...
+# [rewget] Success at Stage 2 (chrome_120)
 # (file downloads successfully)
 ```
 
@@ -222,15 +222,15 @@ rwget https://cloudflare-protected-site.com/
 - [x] Lazy Chromium download on first Stage 3 use
 - [x] Headless Chromium integration in daemon
 - [ ] Browser pool management
-- [x] `--rwget-js` flag
-- [x] `--rwget-js-wait` conditions
+- [x] `--rewget-js` flag
+- [x] `--rewget-js-wait` conditions
 - [x] Stage 2 → Stage 3 automatic fallback
 - [x] Cookie export from browser session
 
 ### Technical Tasks
 
 1. ✅ Implement Chromium downloader (auto-download on first Stage 3 use, ~150MB)
-2. ✅ Store Chromium in `~/.local/share/rwget/chromium/`
+2. ✅ Store Chromium in `~/.local/share/rewget/chromium/`
 3. ✅ Integrate `chromiumoxide` for headless browser control
 4. ⏭️ Implement browser pool with warm instances
 5. ✅ Implement navigation and wait conditions (delay, selector, networkidle)
@@ -242,14 +242,14 @@ rwget https://cloudflare-protected-site.com/
 
 ```bash
 # First Stage 3 use triggers download
-rwget https://js-protected-site.com/
-# [rwget] Stage 3 requires Chromium. Downloading (~150MB)...
-# [rwget] Chromium downloaded to ~/.local/share/rwget/chromium/
-# [rwget] Success at Stage 3 (JS preflight)
+rewget https://js-protected-site.com/
+# [rewget] Stage 3 requires Chromium. Downloading (~150MB)...
+# [rewget] Chromium downloaded to ~/.local/share/rewget/chromium/
+# [rewget] Success at Stage 3 (JS preflight)
 
 # Manual management
-rwget --rwget-download-chromium   # Pre-download
-rwget --rwget-chromium-path       # Show install path
+rewget --rewget-download-chromium   # Pre-download
+rewget --rewget-chromium-path       # Show install path
 ```
 
 ### Dependencies
@@ -260,10 +260,10 @@ rwget --rwget-chromium-path       # Show install path
 ### Exit Criteria
 
 ```bash
-rwget https://heavily-protected-site.com/
-# [rwget] 403 Forbidden - retrying with impersonation...
-# [rwget] 403 Forbidden - retrying with JS preflight...
-# [rwget] Success at Stage 3 (JS preflight)
+rewget https://heavily-protected-site.com/
+# [rewget] 403 Forbidden - retrying with impersonation...
+# [rewget] 403 Forbidden - retrying with JS preflight...
+# [rewget] Success at Stage 3 (JS preflight)
 # (file downloads successfully)
 ```
 
@@ -277,10 +277,10 @@ rwget https://heavily-protected-site.com/
 
 - [ ] Profile update server infrastructure (needs hosting)
 - [x] Ed25519 signed profile verification
-- [x] `--rwget-update-profiles` command (fetches from remote URL)
-- [x] `--rwget-verify-profile` command
-- [x] `--rwget-profile-url` custom URL flag
-- [x] `--rwget-no-verify` skip signature verification
+- [x] `--rewget-update-profiles` command (fetches from remote URL)
+- [x] `--rewget-verify-profile` command
+- [x] `--rewget-profile-url` custom URL flag
+- [x] `--rewget-no-verify` skip signature verification
 - [ ] Auto-update check (optional, off by default)
 
 ### Technical Tasks
@@ -298,10 +298,10 @@ rwget https://heavily-protected-site.com/
 ### Exit Criteria
 
 ```bash
-rwget --rwget-update-profiles
-# [rwget] Downloading profile index...
-# [rwget] Updated: chrome_125, firefox_126
-# [rwget] 2 profiles updated
+rewget --rewget-update-profiles
+# [rewget] Downloading profile index...
+# [rewget] Updated: chrome_125, firefox_126
+# [rewget] 2 profiles updated
 ```
 
 ---
@@ -444,6 +444,6 @@ See `CONTRIBUTING.md` for how to help with implementation. Priority areas for Ph
 - GitHub Actions CI/CD for all build targets
 - Shell completions: bash, zsh, fish, PowerShell
 - Man page generation via clap_mangen
-- LTO-optimized binaries (rwget: 3.3MB, rwgetd: 9.5MB)
+- LTO-optimized binaries (rewget: 3.3MB, rewgetd: 9.5MB)
 - Homebrew formula for easy installation
 - 42 unit tests passing

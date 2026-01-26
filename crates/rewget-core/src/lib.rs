@@ -1,4 +1,4 @@
-//! rwget-core: Shared library for rwget components
+//! rewget-core: Shared library for rewget components
 
 pub mod cache;
 pub mod chromium;

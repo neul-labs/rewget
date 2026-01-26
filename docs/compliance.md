@@ -1,20 +1,20 @@
 # Compliance
 
-Compatibility with wget is the primary goal. rwget should produce identical output to wget when downloads succeed, regardless of which fallback stage was used.
+Compatibility with wget is the primary goal. rewget should produce identical output to wget when downloads succeed, regardless of which fallback stage was used.
 
 ## Compatibility modes
 
 ### Default mode (with fallback)
 
-When rwget succeeds at any stage:
+When rewget succeeds at any stage:
 
 - Downloaded files match what wget would produce for the final URL.
 - Exit code is 0 on success.
-- Fallback messages go to stderr (suppressible with `--rwget-quiet`).
+- Fallback messages go to stderr (suppressible with `--rewget-quiet`).
 
-### Strict mode (`--rwget-no-fallback`)
+### Strict mode (`--rewget-no-fallback`)
 
-When `--rwget-no-fallback` is used:
+When `--rewget-no-fallback` is used:
 
 - stdout and stderr match wget exactly.
 - Exit codes are identical to wget.
@@ -30,8 +30,8 @@ Use strict mode for:
 
 The suite validates two things:
 
-1. **Strict mode**: rwget with `--rwget-no-fallback` is indistinguishable from wget.
-2. **Fallback mode**: rwget produces correct files when fallback stages are used.
+1. **Strict mode**: rewget with `--rewget-no-fallback` is indistinguishable from wget.
+2. **Fallback mode**: rewget produces correct files when fallback stages are used.
 
 ### Strict mode validation
 
@@ -49,7 +49,7 @@ The suite validates two things:
 
 ## Minimum golden suite
 
-### Strict mode tests (with `--rwget-no-fallback`)
+### Strict mode tests (with `--rewget-no-fallback`)
 
 1. Single file download
 2. Redirect handling (`--max-redirect`)
@@ -69,11 +69,11 @@ The suite validates two things:
 4. Cookie accumulation across fallback stages
 5. Timeout handling per stage
 6. Body pattern detection triggering fallback
-7. `--rwget-quiet` suppresses fallback messages
+7. `--rewget-quiet` suppresses fallback messages
 
 ## Harness expectations
 
-- Strict mode tests run wget and rwget with identical inputs; compare byte-for-byte.
+- Strict mode tests run wget and rewget with identical inputs; compare byte-for-byte.
 - Fallback tests use a fixture server that returns 403/challenge pages initially.
 - File tree comparisons verify paths, sizes, and content hashes.
 - Tests should run against controlled fixture servers to avoid flakiness.
@@ -92,6 +92,6 @@ Each platform must have a pinned wget binary for the compliance baseline.
 
 ## Gate
 
-No rwget release until:
+No rewget release until:
 - Strict mode passes 100% on all supported platforms
 - Fallback mode passes on Linux (reference platform)

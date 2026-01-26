@@ -163,7 +163,7 @@ sec-ch-ua-platform: "macOS"
 
 ## Profile Format
 
-Profiles are stored as JSON in `~/.config/rwget/profiles/`:
+Profiles are stored as JSON in `~/.config/rewget/profiles/`:
 
 ```json
 {
@@ -264,7 +264,7 @@ Profiles are stored as JSON in `~/.config/rwget/profiles/`:
 Profiles are distributed from a central server:
 
 ```
-https://profiles.rwget.dev/v1/
+https://profiles.rewget.dev/v1/
 ├── index.json           # List of all available profiles
 ├── chrome/
 │   ├── chrome_120.json
@@ -306,32 +306,32 @@ https://profiles.rwget.dev/v1/
 All profile updates are signed with Ed25519:
 
 1. Server signs `index.json` with private key
-2. Public key is embedded in rwget binary
+2. Public key is embedded in rewget binary
 3. Client verifies signature before applying updates
 4. Individual profile files are verified via SHA-256 from signed index
 
 ```rust
-// Embedded in rwget binary
+// Embedded in rewget binary
 const PROFILE_PUBLIC_KEY: &[u8] = b"...";
 ```
 
 ### Update Flow
 
 ```
-rwget --rwget-update-profiles
+rewget --rewget-update-profiles
 
-1. Fetch https://profiles.rwget.dev/v1/index.json
-2. Fetch https://profiles.rwget.dev/v1/signatures/index.json.sig
+1. Fetch https://profiles.rewget.dev/v1/index.json
+2. Fetch https://profiles.rewget.dev/v1/signatures/index.json.sig
 3. Verify Ed25519 signature against embedded public key
 4. Compare local profiles against remote index
 5. Download new/updated profiles
 6. Verify SHA-256 of each downloaded file
-7. Atomic rename into ~/.config/rwget/profiles/
+7. Atomic rename into ~/.config/rewget/profiles/
 ```
 
 ### Offline Bundling
 
-The rwget binary bundles the 3 most recent profiles for each major browser as a fallback when updates are unavailable.
+The rewget binary bundles the 3 most recent profiles for each major browser as a fallback when updates are unavailable.
 
 ## Testing Strategy
 
@@ -347,13 +347,13 @@ Capture real browser fingerprints using:
 
 ```bash
 # Verify TLS fingerprint
-rwget --rwget-debug --rwget-profile=chrome_120 https://scrapfly.io/web-scraping-tools/ja3-fingerprint
+rewget --rewget-debug --rewget-profile=chrome_120 https://scrapfly.io/web-scraping-tools/ja3-fingerprint
 
 # Verify HTTP/2 fingerprint
-rwget --rwget-debug --rwget-profile=chrome_120 https://browserleaks.com/http2
+rewget --rewget-debug --rewget-profile=chrome_120 https://browserleaks.com/http2
 
 # Verify headers
-rwget --rwget-debug --rwget-profile=chrome_120 https://httpbin.org/headers
+rewget --rewget-debug --rewget-profile=chrome_120 https://httpbin.org/headers
 ```
 
 ### Automated Testing
@@ -377,10 +377,10 @@ fingerprint-tests:
 
 ### Local Verification Server
 
-rwget ships with a local verification tool:
+rewget ships with a local verification tool:
 
 ```bash
-rwget --rwget-verify-profile chrome_120
+rewget --rewget-verify-profile chrome_120
 
 TLS Fingerprint:
   JA3: 771,4865-4866-4867-... ✓
@@ -404,7 +404,7 @@ When updating profiles:
 
 1. Capture fingerprint from real browser (Selenium/Playwright)
 2. Generate profile JSON
-3. Run rwget with new profile against verification services
+3. Run rewget with new profile against verification services
 4. Compare fingerprints
 5. Gate release on 100% match
 

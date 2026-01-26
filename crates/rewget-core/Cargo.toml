@@ -1,5 +1,5 @@
 [package]
-name = "rwget-core"
+name = "rewget-core"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -8,7 +8,7 @@ documentation.workspace = true
 homepage.workspace = true
 authors.workspace = true
 readme = "../../README.md"
-description = "Shared library for rwget"
+description = "Shared library for rewget"
 keywords = ["wget", "http", "download"]
 categories = ["network-programming"]
 

@@ -2,7 +2,7 @@
 
 ## High-level flow
 
-1. `rwget` parses its own `--rwget-*` flags.
+1. `rewget` parses its own `--rewget-*` flags.
 2. Stage 1: Run `wget_engine` and capture response.
 3. If Stage 1 fails with a triggering condition, proceed to Stage 2 (impersonation).
 4. If Stage 2 fails, proceed to Stage 3 (JS preflight via daemon).
@@ -10,7 +10,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         rwget URL                               │
+│                         rewget URL                               │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -35,7 +35,7 @@
                               │ no
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│  Stage 3: JS Preflight (rwgetd)                                 │
+│  Stage 3: JS Preflight (rewgetd)                                 │
 │  - Full browser session (Chromium)                              │
 │  - Solve challenges (Cloudflare, CAPTCHAs)                      │
 │  - Export cookies + final URL, replay with wget                 │
@@ -47,14 +47,14 @@
 
 ## Components
 
-### rwget (shim)
+### rewget (shim)
 
-- Parses only `--rwget-*` flags.
+- Parses only `--rewget-*` flags.
 - Leaves all other arguments intact and in order.
 - Preserves environment and working directory.
-- Removes `--rwget-*` flags before invoking wget.
+- Removes `--rewget-*` flags before invoking wget.
 
-### rwgetd (daemon)
+### rewgetd (daemon)
 
 - Executes wget jobs as a service.
 - Owns warm resources (browser pool, cookie storage).
@@ -83,7 +83,7 @@ Checked immediately from wget's exit code and server response headers:
 
 ### Body pattern detection (soft blocks)
 
-Some sites return `200 OK` with a challenge page. rwget buffers small responses and scans for known patterns:
+Some sites return `200 OK` with a challenge page. rewget buffers small responses and scans for known patterns:
 
 | Pattern | Indicates |
 |---------|-----------|
@@ -100,46 +100,46 @@ Body detection only runs when:
 - Content-Type is `text/html`
 - Response size < 100KB (challenge pages are small)
 
-Configurable via `--rwget-fallback-patterns` (add custom patterns) or `--rwget-no-body-detection` (disable).
+Configurable via `--rewget-fallback-patterns` (add custom patterns) or `--rewget-no-body-detection` (disable).
 
 ## Execution paths
 
 ### Default path (with fallback)
 
-In default mode, rwget spawns wget as a child process to capture the response:
+In default mode, rewget spawns wget as a child process to capture the response:
 
-1. `rwget` spawns `wget_engine` as a subprocess (not exec).
+1. `rewget` spawns `wget_engine` as a subprocess (not exec).
 2. Captures exit code and, for small HTML responses, buffers content.
 3. If success, streams buffered output and exits.
 4. If failure detected, proceeds to Stage 2 (no output emitted yet).
 5. Stage 2/3 run via daemon, stream output on success.
 
 ```
-rwget
+rewget
   ├─ spawn wget_engine (Stage 1)
   │    └─ capture exit code + response
-  ├─ if blocked: spawn/connect rwgetd
+  ├─ if blocked: spawn/connect rewgetd
   │    ├─ Stage 2: impersonation request
   │    └─ Stage 3: JS preflight
   └─ stream successful output to caller
 ```
 
-### Strict path (`--rwget-no-fallback`)
+### Strict path (`--rewget-no-fallback`)
 
-With `--rwget-no-fallback`, rwget uses exec for zero overhead:
+With `--rewget-no-fallback`, rewget uses exec for zero overhead:
 
-- `rwget` replaces itself with `wget_engine` using `exec()`.
+- `rewget` replaces itself with `wget_engine` using `exec()`.
 - Signal handling and terminal state are inherited from the caller.
 - No response capture, no fallback, identical to running wget directly.
 
-### Daemon path (`--rwget-daemon=on`)
+### Daemon path (`--rewget-daemon=on`)
 
-When daemon is forced, all requests route through `rwgetd`:
+When daemon is forced, all requests route through `rewgetd`:
 
-- `rwget` sends a request containing argv, environment delta, cwd, and TTY metadata.
-- `rwgetd` spawns `wget_engine` and streams stdout/stderr back to the client.
+- `rewget` sends a request containing argv, environment delta, cwd, and TTY metadata.
+- `rewgetd` spawns `wget_engine` and streams stdout/stderr back to the client.
 - The daemon returns the exit code as produced by the engine.
-- Fallback still applies unless `--rwget-no-fallback` is also set.
+- Fallback still applies unless `--rewget-no-fallback` is also set.
 
 ## IPC
 
@@ -171,7 +171,7 @@ Transport uses nng to support request/response plus streaming stdout/stderr.
 
 ## Domain stage cache
 
-rwget caches which stage succeeded for each domain to skip unnecessary retries.
+rewget caches which stage succeeded for each domain to skip unnecessary retries.
 
 ### Cache behavior
 
@@ -186,7 +186,7 @@ Second request to protected.example.com:
 
 ### Cache storage
 
-Location: `~/.cache/rwget/stage-cache.json`
+Location: `~/.cache/rewget/stage-cache.json`
 
 ```json
 {
@@ -210,12 +210,12 @@ Location: `~/.cache/rwget/stage-cache.json`
 
 ### Flags
 
-- `--rwget-no-cache`: Ignore cache, always start at Stage 1
-- `--rwget-clear-cache`: Delete cache file
+- `--rewget-no-cache`: Ignore cache, always start at Stage 1
+- `--rewget-clear-cache`: Delete cache file
 
 ## Engine selection
 
-rwget supports multiple wget implementations:
+rewget supports multiple wget implementations:
 
 | Engine | Binary | Notes |
 |--------|--------|-------|
@@ -224,7 +224,7 @@ rwget supports multiple wget implementations:
 
 ### Selection priority
 
-1. `--rwget-engine=wget2` flag (highest)
+1. `--rewget-engine=wget2` flag (highest)
 2. `RWGET_ENGINE=wget2` environment variable
 3. Config file setting
 4. Default: `wget`
@@ -239,7 +239,7 @@ rwget supports multiple wget implementations:
 
 The impersonation layer mimics browser TLS and HTTP fingerprints without running a full browser. This is faster than Stage 3 and handles most bot detection systems.
 
-**Execution**: Stage 2 runs inside `rwgetd` (the daemon). The daemon is spawned inline on first Stage 2 request and kept alive for subsequent requests.
+**Execution**: Stage 2 runs inside `rewgetd` (the daemon). The daemon is spawned inline on first Stage 2 request and kept alive for subsequent requests.
 
 ### TLS fingerprinting
 
@@ -269,11 +269,11 @@ HTTP/2 connections expose additional fingerprint surface:
 
 ### Implementation approach
 
-Built in Rust as part of `rwgetd`:
+Built in Rust as part of `rewgetd`:
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│  rwget-impersonate (Rust)                                    │
+│  rewget-impersonate (Rust)                                    │
 ├──────────────────────────────────────────────────────────────┤
 │  rustls + custom ClientConfig                                │
 │  - BoringSSL-derived cipher suites                           │
@@ -295,8 +295,8 @@ Built in Rust as part of `rwgetd`:
 ### Profile updates
 
 Browser fingerprints change with each release. The profile database should be:
-- Versioned independently from rwget releases
-- Updateable via `rwget --rwget-update-profiles`
+- Versioned independently from rewget releases
+- Updateable via `rewget --rewget-update-profiles`
 - Shipped with last 3 versions of each major browser
 
 ### Fallback to Stage 3
@@ -308,7 +308,7 @@ Impersonation fails when:
 
 ## JS preflight routing (Stage 3)
 
-- JS preflight always runs inside `rwgetd`.
+- JS preflight always runs inside `rewgetd`.
 - Uses headless Chromium via `chromiumoxide` or `headless_chrome` crate.
 - Browser pool is kept warm for subsequent requests.
-- If `--rwget-js` is provided, `rwget` skips directly to Stage 3.
+- If `--rewget-js` is provided, `rewget` skips directly to Stage 3.

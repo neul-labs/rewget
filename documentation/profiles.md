@@ -13,7 +13,7 @@ Each profile contains:
 
 ## Available Profiles
 
-rwget ships with 6 built-in profiles:
+rewget ships with 6 built-in profiles:
 
 | Profile | Browser | Platform | Best For |
 |---------|---------|----------|----------|
@@ -29,7 +29,7 @@ rwget ships with 6 built-in profiles:
 ### List Available Profiles
 
 ```bash
-rwget --rwget-list-profiles
+rewget --rewget-list-profiles
 ```
 
 Output:
@@ -56,13 +56,13 @@ Total: 6 profiles
 ### Select a Specific Profile
 
 ```bash
-rwget --rwget-profile=firefox_136 https://example.com/
+rewget --rewget-profile=firefox_136 https://example.com/
 ```
 
 ### Verify Profile Details
 
 ```bash
-rwget --rwget-verify-profile=chrome_131
+rewget --rewget-verify-profile=chrome_131
 ```
 
 Output:
@@ -110,16 +110,16 @@ Default Headers: 8
 Browser fingerprints change with each browser version. Keep profiles current:
 
 ```bash
-rwget --rwget-update-profiles
+rewget --rewget-update-profiles
 ```
 
 Output:
 ```
-[rwget] Fetching profiles from: https://rwget.dev/profiles/v1/index.json
-[rwget] Updated: chrome_132, firefox_137
-[rwget] Added: chrome_133
-[rwget] Unchanged: 4 profiles
-[rwget] Total: 7 profiles
+[rewget] Fetching profiles from: https://rewget.dev/profiles/v1/index.json
+[rewget] Updated: chrome_132, firefox_137
+[rewget] Added: chrome_133
+[rewget] Unchanged: 4 profiles
+[rewget] Total: 7 profiles
 ```
 
 ### Custom Profile Source
@@ -127,7 +127,7 @@ Output:
 Use your own profile server:
 
 ```bash
-rwget --rwget-profile-url=https://my-server.com/profiles.json --rwget-update-profiles
+rewget --rewget-profile-url=https://my-server.com/profiles.json --rewget-update-profiles
 ```
 
 ### Skip Verification
@@ -135,12 +135,12 @@ rwget --rwget-profile-url=https://my-server.com/profiles.json --rwget-update-pro
 For testing only:
 
 ```bash
-rwget --rwget-no-verify --rwget-update-profiles
+rewget --rewget-no-verify --rewget-update-profiles
 ```
 
 ## Profile Selection Logic
 
-When no profile is specified, rwget selects automatically:
+When no profile is specified, rewget selects automatically:
 
 1. **Cached profile**: If the domain has a cached successful profile, use it
 2. **Chrome latest**: Try the newest Chrome profile first
@@ -148,7 +148,7 @@ When no profile is specified, rwget selects automatically:
 
 ## Profile File Format
 
-Profiles are stored as JSON in `~/.local/share/rwget/profiles/`:
+Profiles are stored as JSON in `~/.local/share/rewget/profiles/`:
 
 ```json
 {
@@ -194,9 +194,9 @@ Profiles are stored as JSON in `~/.local/share/rwget/profiles/`:
 
 ### Signature Verification
 
-Profile updates are signed with Ed25519. rwget verifies signatures before applying updates.
+Profile updates are signed with Ed25519. rewget verifies signatures before applying updates.
 
-The public key is embedded in rwget. Updates from unofficial sources will fail verification unless `--rwget-no-verify` is used.
+The public key is embedded in rewget. Updates from unofficial sources will fail verification unless `--rewget-no-verify` is used.
 
 ### Privacy Considerations
 
@@ -209,27 +209,27 @@ The public key is embedded in rwget. Updates from unofficial sources will fail v
 For advanced users, you can create custom profiles:
 
 1. Create a JSON file following the format above
-2. Place it in `~/.local/share/rwget/profiles/`
-3. Use it with `--rwget-profile=your_profile_name`
+2. Place it in `~/.local/share/rewget/profiles/`
+3. Use it with `--rewget-profile=your_profile_name`
 
 !!! note
-    Custom profiles won't be overwritten by `--rwget-update-profiles`.
+    Custom profiles won't be overwritten by `--rewget-update-profiles`.
 
 ## Troubleshooting Profiles
 
 ### Profile Not Found
 
 ```
-[rwget] Profile 'unknown_profile' not found
+[rewget] Profile 'unknown_profile' not found
 ```
 
-List available profiles with `--rwget-list-profiles`.
+List available profiles with `--rewget-list-profiles`.
 
 ### Update Failed
 
 ```
-[rwget] Remote update failed: connection refused
-[rwget] Falling back to built-in defaults...
+[rewget] Remote update failed: connection refused
+[rewget] Falling back to built-in defaults...
 ```
 
 Check your network connection. Built-in profiles are restored automatically.
@@ -237,7 +237,7 @@ Check your network connection. Built-in profiles are restored automatically.
 ### Verification Failed
 
 ```
-[rwget] Signature verification failed
+[rewget] Signature verification failed
 ```
 
-The profile source may be compromised. Only use `--rwget-no-verify` if you trust the source.
+The profile source may be compromised. Only use `--rewget-no-verify` if you trust the source.

@@ -67,19 +67,19 @@ jobs:
         include:
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
-            artifact: rwget-linux-x64
+            artifact: rewget-linux-x64
           - os: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            artifact: rwget-linux-arm64
+            artifact: rewget-linux-arm64
           - os: macos-latest
             target: x86_64-apple-darwin
-            artifact: rwget-macos-x64
+            artifact: rewget-macos-x64
           - os: macos-latest
             target: aarch64-apple-darwin
-            artifact: rwget-macos-arm64
+            artifact: rewget-macos-arm64
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-            artifact: rwget-windows-x64
+            artifact: rewget-windows-x64
 
     steps:
       - uses: actions/checkout@v4
@@ -106,8 +106,8 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: |
-            target/${{ matrix.target }}/release/rwget
-            target/${{ matrix.target }}/release/rwgetd
+            target/${{ matrix.target }}/release/rewget
+            target/${{ matrix.target }}/release/rewgetd
 
       - name: Upload artifacts (Windows)
         if: runner.os == 'Windows'
@@ -115,8 +115,8 @@ jobs:
         with:
           name: ${{ matrix.artifact }}
           path: |
-            target/${{ matrix.target }}/release/rwget.exe
-            target/${{ matrix.target }}/release/rwgetd.exe
+            target/${{ matrix.target }}/release/rewget.exe
+            target/${{ matrix.target }}/release/rewgetd.exe
 
   docs:
     name: Build & Deploy Docs

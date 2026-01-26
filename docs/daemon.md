@@ -1,6 +1,6 @@
 # Daemon
 
-`rwgetd` is a long-running process that handles Stage 2 (impersonation) and Stage 3 (JS preflight) requests. It manages warm resources like browser pools and TLS sessions.
+`rewgetd` is a long-running process that handles Stage 2 (impersonation) and Stage 3 (JS preflight) requests. It manages warm resources like browser pools and TLS sessions.
 
 ## When the daemon is used
 
@@ -23,16 +23,16 @@ The daemon is spawned **inline** on first Stage 2/3 request and kept alive for s
 ## Lifecycle
 
 - The daemon is started inline on first fallback to Stage 2 or 3.
-- Inline means `rwgetd` runs as a child process, not a system service.
+- Inline means `rewgetd` runs as a child process, not a system service.
 - The daemon auto-shuts down after an idle timeout (default: 5 minutes).
-- `--rwget-daemon=on` forces all requests through the daemon.
-- `--rwget-daemon=off` disables persistent daemon; Stage 2/3 still work but spawn fresh processes.
+- `--rewget-daemon=on` forces all requests through the daemon.
+- `--rewget-daemon=off` disables persistent daemon; Stage 2/3 still work but spawn fresh processes.
 
 ## Job execution
 
 ### Stage 2 (Impersonation)
 
-1. Daemon receives URL and profile name from `rwget`.
+1. Daemon receives URL and profile name from `rewget`.
 2. Performs request with browser TLS/HTTP2 fingerprint.
 3. Extracts cookies and final URL (after redirects).
 4. Spawns `wget_engine` with cookies injected.
@@ -40,7 +40,7 @@ The daemon is spawned **inline** on first Stage 2/3 request and kept alive for s
 
 ### Stage 3 (JS Preflight)
 
-1. Daemon receives URL and wait conditions from `rwget`.
+1. Daemon receives URL and wait conditions from `rewget`.
 2. Ensures Chromium is available (lazy download if needed).
 3. Allocates browser from warm pool (or spawns new).
 4. Navigates browser to URL, waits for condition.
@@ -54,7 +54,7 @@ The daemon is spawned **inline** on first Stage 2/3 request and kept alive for s
 Chromium is downloaded on first Stage 3 use:
 
 ```
-~/.local/share/rwget/chromium/
+~/.local/share/rewget/chromium/
 ├── chrome-linux64/          # Extracted browser
 ├── version.txt              # e.g., "120.0.6099.109"
 └── download.lock            # Prevents concurrent downloads
@@ -63,7 +63,7 @@ Chromium is downloaded on first Stage 3 use:
 Download source: Chrome for Testing (official Google builds)
 Size: ~150MB compressed, ~450MB extracted
 
-Pre-download with: `rwget --rwget-download-chromium`
+Pre-download with: `rewget --rewget-download-chromium`
 
 ### Isolation
 
@@ -91,6 +91,6 @@ Pre-download with: `rwget --rwget-download-chromium`
 
 ## Observability
 
-- `--rwget-debug` enables verbose routing and protocol logs.
-- Daemon logs to `~/.local/share/rwget/daemon.log` when running.
+- `--rewget-debug` enables verbose routing and protocol logs.
+- Daemon logs to `~/.local/share/rewget/daemon.log` when running.
 - The daemon should not write to stdout/stderr to avoid polluting wget output.

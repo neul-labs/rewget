@@ -1,5 +1,5 @@
 [package]
-name = "rwget"
+name = "rewget"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -13,11 +13,11 @@ keywords = ["wget", "http", "download", "cli"]
 categories = ["command-line-utilities", "network-programming"]
 
 [[bin]]
-name = "rwget"
+name = "rewget"
 path = "src/main.rs"
 
 [dependencies]
-rwget-core.workspace = true
+rewget-core.workspace = true
 anyhow.workspace = true
 thiserror.workspace = true
 dirs.workspace = true

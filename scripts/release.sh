@@ -1,11 +1,11 @@
 #!/bin/bash
-# Release script for rwget
+# Release script for rewget
 # Builds release binaries and creates release tarballs
 
 set -e
 
 VERSION=$(grep '^version = ' Cargo.toml | head -1 | cut -d'"' -f2)
-echo "Building rwget v${VERSION}..."
+echo "Building rewget v${VERSION}..."
 
 # Build directory
 RELEASE_DIR="target/release-dist"
@@ -24,16 +24,16 @@ build_target() {
 
         # Copy binaries
         if [[ "$target" == *"windows"* ]]; then
-            cp "target/$target/release/rwget.exe" "$out_dir/"
-            cp "target/$target/release/rwgetd.exe" "$out_dir/"
+            cp "target/$target/release/rewget.exe" "$out_dir/"
+            cp "target/$target/release/rewgetd.exe" "$out_dir/"
         else
-            cp "target/$target/release/rwget" "$out_dir/"
-            cp "target/$target/release/rwgetd" "$out_dir/"
+            cp "target/$target/release/rewget" "$out_dir/"
+            cp "target/$target/release/rewgetd" "$out_dir/"
         fi
 
         # Copy man page
-        if [[ -f "target/$target/release/build/rwget-"*/out/man/rwget.1 ]]; then
-            cp "target/$target/release/build/rwget-"*/out/man/rwget.1 "$out_dir/"
+        if [[ -f "target/$target/release/build/rewget-"*/out/man/rewget.1 ]]; then
+            cp "target/$target/release/build/rewget-"*/out/man/rewget.1 "$out_dir/"
         fi
 
         # Copy README and LICENSE
@@ -41,8 +41,8 @@ build_target() {
         cp LICENSE "$out_dir/" 2>/dev/null || true
 
         # Create tarball
-        local tarball="$RELEASE_DIR/rwget-$name.tar.gz"
-        (cd "$RELEASE_DIR" && tar -czf "rwget-$name.tar.gz" "$name")
+        local tarball="$RELEASE_DIR/rewget-$name.tar.gz"
+        (cd "$RELEASE_DIR" && tar -czf "rewget-$name.tar.gz" "$name")
 
         # Calculate SHA256
         local sha256=$(sha256sum "$tarball" | cut -d' ' -f1)
@@ -67,10 +67,10 @@ cargo build --release
 # Copy native build
 NATIVE_DIR="$RELEASE_DIR/native"
 mkdir -p "$NATIVE_DIR"
-cp target/release/rwget "$NATIVE_DIR/"
-cp target/release/rwgetd "$NATIVE_DIR/"
-if [[ -f target/release/build/rwget-*/out/man/rwget.1 ]]; then
-    cp target/release/build/rwget-*/out/man/rwget.1 "$NATIVE_DIR/"
+cp target/release/rewget "$NATIVE_DIR/"
+cp target/release/rewgetd "$NATIVE_DIR/"
+if [[ -f target/release/build/rewget-*/out/man/rewget.1 ]]; then
+    cp target/release/build/rewget-*/out/man/rewget.1 "$NATIVE_DIR/"
 fi
 cp README.md "$NATIVE_DIR/"
 

@@ -35,7 +35,7 @@ impl Engine {
     /// Find the engine binary path
     ///
     /// Search order:
-    /// 1. Bundled engine in rwget's directory (wget_engine / wget2_engine)
+    /// 1. Bundled engine in rewget's directory (wget_engine / wget2_engine)
     /// 2. System PATH
     pub fn find_binary(&self) -> Result<PathBuf> {
         let bundled_name = match self {
@@ -43,7 +43,7 @@ impl Engine {
             Engine::Wget2 => "wget2_engine",
         };
 
-        // First, try to find bundled engine next to rwget binary
+        // First, try to find bundled engine next to rewget binary
         if let Ok(exe_path) = std::env::current_exe() {
             if let Some(exe_dir) = exe_path.parent() {
                 let bundled_path = exe_dir.join(bundled_name);
@@ -57,7 +57,7 @@ impl Engine {
         let system_name = self.binary_name();
         which::which(system_name)
             .map_err(|_| Error::EngineNotFound(format!(
-                "Could not find '{}' or '{}' in PATH. Please install {} or place {} next to rwget.",
+                "Could not find '{}' or '{}' in PATH. Please install {} or place {} next to rewget.",
                 bundled_name, system_name, system_name, bundled_name
             )))
     }

@@ -1,13 +1,13 @@
 # Architecture
 
-Technical overview of rwget's internal architecture.
+Technical overview of rewget's internal architecture.
 
 ## Project Structure
 
 ```
-rwget/
+rewget/
 ├── crates/
-│   ├── rwget/           # CLI binary
+│   ├── rewget/           # CLI binary
 │   │   ├── src/
 │   │   │   ├── main.rs      # Entry point
 │   │   │   ├── args.rs      # Argument parsing
@@ -16,14 +16,14 @@ rwget/
 │   │   │   └── daemon.rs    # Daemon communication
 │   │   └── build.rs     # Shell completions, man page
 │   │
-│   ├── rwgetd/          # Daemon binary
+│   ├── rewgetd/          # Daemon binary
 │   │   └── src/
 │   │       ├── main.rs      # Daemon entry point
 │   │       ├── server.rs    # IPC server
 │   │       ├── impersonate.rs  # Stage 2 logic
 │   │       └── preflight.rs    # Stage 3 logic
 │   │
-│   └── rwget-core/      # Shared library
+│   └── rewget-core/      # Shared library
 │       └── src/
 │           ├── lib.rs       # Public API
 │           ├── config.rs    # Configuration types
@@ -47,7 +47,7 @@ rwget/
                                 │
                                 ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                          rwget CLI                                │
+│                          rewget CLI                                │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
 │  │  args.rs    │  │  exec.rs    │  │  daemon.rs  │              │
 │  │  (parsing)  │  │  (Stage 1)  │  │  (IPC)      │              │
@@ -56,7 +56,7 @@ rwget/
                                             │ nng IPC
                                             ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                         rwgetd Daemon                             │
+│                         rewgetd Daemon                             │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐              │
 │  │ server.rs   │  │impersonate  │  │ preflight   │              │
 │  │ (IPC recv)  │  │  (Stage 2)  │  │  (Stage 3)  │              │
@@ -75,9 +75,9 @@ rwget/
 ### Stage 1: Direct wget
 
 ```
-rwget args
+rewget args
     │
-    ├─ Parse --rwget-* flags
+    ├─ Parse --rewget-* flags
     │
     ├─ Check domain cache
     │      │
@@ -99,9 +99,9 @@ rwget args
 ### Stage 2: Impersonation
 
 ```
-rwget
+rewget
     │
-    ├─ Connect to rwgetd (spawn if needed)
+    ├─ Connect to rewgetd (spawn if needed)
     │
     ├─ Send Stage 2 request
     │      {url, profile, timeout, headers}
@@ -116,7 +116,7 @@ rwget
 ### Stage 3: JavaScript Preflight
 
 ```
-rwgetd
+rewgetd
     │
     ├─ Launch Chromium (download if needed)
     │
@@ -135,7 +135,7 @@ rwgetd
 
 ## IPC Protocol
 
-rwget and rwgetd communicate via nng (nanomsg-next-gen) using JSON messages.
+rewget and rewgetd communicate via nng (nanomsg-next-gen) using JSON messages.
 
 ### Request Format
 
@@ -149,7 +149,7 @@ rwget and rwgetd communicate via nng (nanomsg-next-gen) using JSON messages.
   "headers": {
     "Accept": "text/html"
   },
-  "output_path": "/tmp/rwget-output.tmp",
+  "output_path": "/tmp/rewget-output.tmp",
   "js_wait": null
 }
 ```
@@ -165,7 +165,7 @@ rwget and rwgetd communicate via nng (nanomsg-next-gen) using JSON messages.
     "Content-Type": "text/html",
     "Content-Length": "1234"
   },
-  "body_path": "/tmp/rwget-output.tmp",
+  "body_path": "/tmp/rewget-output.tmp",
   "cookies": [
     {"name": "cf_clearance", "value": "...", "domain": ".example.com"}
   ],
@@ -270,14 +270,14 @@ fn exec_wget(...) {
 // ipc.rs - Socket paths
 #[cfg(unix)]
 pub fn socket_path() -> PathBuf {
-    // ~/.cache/rwget/rwgetd.sock
-    dirs::runtime_dir().join("rwget/rwgetd.sock")
+    // ~/.cache/rewget/rewgetd.sock
+    dirs::runtime_dir().join("rewget/rewgetd.sock")
 }
 
 #[cfg(windows)]
 pub fn socket_path() -> PathBuf {
     // Named pipe
-    PathBuf::from(r"\\.\pipe\rwget")
+    PathBuf::from(r"\\.\pipe\rewget")
 }
 ```
 
@@ -313,10 +313,10 @@ version = "1.0.0"
 
 ### Build Script
 
-`crates/rwget/build.rs` generates:
+`crates/rewget/build.rs` generates:
 
 - Shell completions (bash, zsh, fish, PowerShell)
-- Man page (rwget.1)
+- Man page (rewget.1)
 
 ### Release Profile
 
@@ -336,24 +336,24 @@ panic = "abort"
 cargo test
 
 # Run specific crate tests
-cargo test -p rwget-core
-cargo test -p rwgetd
+cargo test -p rewget-core
+cargo test -p rewgetd
 
 # Run with output
 cargo test -- --nocapture
 ```
 
-## Extending rwget
+## Extending rewget
 
 ### Adding a New Profile
 
-1. Create JSON file in `~/.local/share/rwget/profiles/`
+1. Create JSON file in `~/.local/share/rewget/profiles/`
 2. Follow the profile structure above
-3. Test with `--rwget-verify-profile=name`
+3. Test with `--rewget-verify-profile=name`
 
 ### Adding a New Detection Pattern
 
-Edit `crates/rwget-core/src/detection.rs`:
+Edit `crates/rewget-core/src/detection.rs`:
 
 ```rust
 pub const BLOCK_PATTERNS: &[&str] = &[

@@ -1,4 +1,4 @@
-//! Domain stage cache for rwget
+//! Domain stage cache for rewget
 //!
 //! Remembers which stage worked for each domain to skip failed stages
 //! on subsequent requests. Cache entries expire after 7 days.
@@ -108,7 +108,7 @@ impl DomainCache {
     fn cache_path() -> PathBuf {
         dirs::cache_dir()
             .unwrap_or_else(|| PathBuf::from(".cache"))
-            .join("rwget")
+            .join("rewget")
             .join("domain-cache.json")
     }
 
@@ -116,7 +116,7 @@ impl DomainCache {
     pub fn cache_dir() -> PathBuf {
         dirs::cache_dir()
             .unwrap_or_else(|| PathBuf::from(".cache"))
-            .join("rwget")
+            .join("rewget")
     }
 }
 

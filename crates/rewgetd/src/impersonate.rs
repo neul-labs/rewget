@@ -4,7 +4,7 @@
 
 use rquest::Client;
 use rquest_util::Emulation;
-use rwget_core::{analyze_body, Request, Response};
+use rewget_core::{analyze_body, Request, Response};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;

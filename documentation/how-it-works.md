@@ -1,6 +1,6 @@
 # How It Works
 
-This page explains the technical details of how rwget bypasses bot detection.
+This page explains the technical details of how rewget bypasses bot detection.
 
 ## The Bot Detection Problem
 
@@ -37,18 +37,18 @@ Some sites require JavaScript execution to:
 
 wget can't execute JavaScript.
 
-## rwget's Three-Stage Solution
+## rewget's Three-Stage Solution
 
 ### Stage 1: Plain wget
 
 ```
 ┌─────────────────┐     ┌─────────────────┐
-│     rwget       │────▶│      wget       │────▶ Server
+│     rewget       │────▶│      wget       │────▶ Server
 │  (passthrough)  │     │                 │
 └─────────────────┘     └─────────────────┘
 ```
 
-rwget first tries plain wget. This is the fastest option and works for most sites.
+rewget first tries plain wget. This is the fastest option and works for most sites.
 
 **Detection**: Checks exit code and response body for:
 - HTTP 403, 429, 503, 520-529
@@ -59,12 +59,12 @@ rwget first tries plain wget. This is the fastest option and works for most site
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│     rwget       │────▶│     rwgetd      │────▶│     rquest      │────▶ Server
+│     rewget       │────▶│     rewgetd      │────▶│     rquest      │────▶ Server
 │                 │ IPC │    (daemon)     │     │  (impersonate)  │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
-rwget sends the request to the daemon, which uses `rquest` with browser emulation:
+rewget sends the request to the daemon, which uses `rquest` with browser emulation:
 
 1. **TLS Handshake**: Mimics browser's exact cipher suite order, extensions, curves
 2. **HTTP/2 Connection**: Uses browser's SETTINGS values and header order
@@ -76,7 +76,7 @@ The server sees what looks like a real browser.
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│     rwget       │────▶│     rwgetd      │────▶│    Chromium     │────▶ Server
+│     rewget       │────▶│     rewgetd      │────▶│    Chromium     │────▶ Server
 │                 │ IPC │    (daemon)     │     │   (headless)    │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                                         │
@@ -96,16 +96,16 @@ For sites requiring JavaScript:
 
 ## Component Architecture
 
-### rwget (CLI)
+### rewget (CLI)
 
 The main binary that users interact with:
 
-- Parses `--rwget-*` flags
+- Parses `--rewget-*` flags
 - Passes remaining flags to wget
 - Manages fallback logic
 - Communicates with daemon via IPC
 
-### rwgetd (Daemon)
+### rewgetd (Daemon)
 
 Background process that handles Stage 2/3:
 
@@ -116,7 +116,7 @@ Background process that handles Stage 2/3:
 
 ### Communication
 
-rwget and rwgetd communicate via nng (nanomsg-next-gen):
+rewget and rewgetd communicate via nng (nanomsg-next-gen):
 
 ```json
 // Request
@@ -140,10 +140,10 @@ rwget and rwgetd communicate via nng (nanomsg-next-gen):
 
 ## Domain Stage Caching
 
-To avoid repeating failed stages, rwget caches successful stages per domain:
+To avoid repeating failed stages, rewget caches successful stages per domain:
 
 ```json
-// ~/.cache/rwget/stage-cache.json
+// ~/.cache/rewget/stage-cache.json
 {
   "protected.example.com": {
     "stage": 2,
@@ -203,7 +203,7 @@ GREASE: Enabled (random values in cipher suites and extensions)
 
 - Uses "Chrome for Testing" (official Google builds)
 - Downloaded on first Stage 3 use (~150MB)
-- Stored in `~/.local/share/rwget/chromium/`
+- Stored in `~/.local/share/rewget/chromium/`
 - Runs in headless mode with anti-detection flags
 
 ### Challenge Resolution
@@ -212,7 +212,7 @@ GREASE: Enabled (random values in cipher suites and extensions)
 2. Cloudflare/etc. JavaScript executes
 3. Challenge cookies are set
 4. Page loads or redirects
-5. rwget extracts final response
+5. rewget extracts final response
 
 ### Wait Conditions
 
@@ -232,13 +232,13 @@ Most downloads complete at Stage 1 with zero overhead. The fallback chain only a
 
 ## Security Considerations
 
-### What rwget Does
+### What rewget Does
 
 - Mimics browser network behavior
 - Executes JavaScript in isolated browser
 - Respects robots.txt (wget behavior)
 
-### What rwget Doesn't Do
+### What rewget Doesn't Do
 
 - Bypass CAPTCHAs requiring human interaction
 - Circumvent legal access controls
@@ -246,4 +246,4 @@ Most downloads complete at Stage 1 with zero overhead. The fallback chain only a
 
 ### Profile Verification
 
-Remote profile updates are signed with Ed25519. The public key is embedded in rwget, preventing malicious profile injection.
+Remote profile updates are signed with Ed25519. The public key is embedded in rewget, preventing malicious profile injection.

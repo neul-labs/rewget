@@ -1,4 +1,4 @@
-//! Failure detection for rwget
+//! Failure detection for rewget
 //!
 //! Detects when wget fails due to bot protection by analyzing:
 //! 1. Exit codes (mapped to HTTP status codes)

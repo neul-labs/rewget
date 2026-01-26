@@ -1,4 +1,4 @@
-//! rwgetd - Daemon for rwget Stage 2/3 execution
+//! rewgetd - Daemon for rewget Stage 2/3 execution
 //!
 //! This daemon handles:
 //! - Stage 2: Impersonation requests with browser TLS/HTTP2 fingerprints
@@ -26,7 +26,7 @@ fn main() -> Result<()> {
         .with_target(false)
         .init();
 
-    info!("rwgetd {} starting", env!("CARGO_PKG_VERSION"));
+    info!("rewgetd {} starting", env!("CARGO_PKG_VERSION"));
 
     // Create persistent tokio runtime (shared across all requests)
     let runtime = Arc::new(Runtime::new()?);

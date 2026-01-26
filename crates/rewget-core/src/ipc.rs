@@ -1,4 +1,4 @@
-//! IPC protocol for rwget <-> rwgetd communication
+//! IPC protocol for rewget <-> rewgetd communication
 //!
 //! Uses nng for request/reply pattern over Unix domain sockets (or named pipes on Windows).
 
@@ -16,25 +16,25 @@ pub fn socket_path() -> PathBuf {
         dirs::runtime_dir()
             .or_else(|| dirs::cache_dir())
             .unwrap_or_else(|| PathBuf::from("/tmp"))
-            .join("rwget")
-            .join("rwgetd.sock")
+            .join("rewget")
+            .join("rewgetd.sock")
     }
 
     #[cfg(windows)]
     {
         dirs::data_local_dir()
             .unwrap_or_else(|| PathBuf::from("C:\\ProgramData"))
-            .join("rwget")
-            .join("rwgetd.pipe")
+            .join("rewget")
+            .join("rewgetd.pipe")
     }
 
     #[cfg(not(any(unix, windows)))]
     {
-        PathBuf::from("/tmp/rwget/rwgetd.sock")
+        PathBuf::from("/tmp/rewget/rewgetd.sock")
     }
 }
 
-/// Request from rwget to rwgetd
+/// Request from rewget to rewgetd
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Request {
     /// Request ID for correlation
@@ -110,7 +110,7 @@ impl Request {
     }
 }
 
-/// Response from rwgetd to rwget
+/// Response from rewgetd to rewget
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Response {
     /// Request ID for correlation
@@ -243,6 +243,6 @@ mod tests {
     #[test]
     fn test_socket_path() {
         let path = socket_path();
-        assert!(path.to_string_lossy().contains("rwgetd.sock"));
+        assert!(path.to_string_lossy().contains("rewgetd.sock"));
     }
 }

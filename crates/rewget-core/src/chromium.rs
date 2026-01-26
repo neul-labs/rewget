@@ -13,7 +13,7 @@ pub const CHROMIUM_VERSION: &str = "131.0.6778.204";
 pub fn chromium_dir() -> PathBuf {
     dirs::data_dir()
         .unwrap_or_else(|| PathBuf::from(".local/share"))
-        .join("rwget")
+        .join("rewget")
         .join("chromium")
 }
 
@@ -293,7 +293,7 @@ mod tests {
     #[test]
     fn test_chromium_dir() {
         let dir = chromium_dir();
-        assert!(dir.to_string_lossy().contains("rwget"));
+        assert!(dir.to_string_lossy().contains("rewget"));
         assert!(dir.to_string_lossy().contains("chromium"));
     }
 

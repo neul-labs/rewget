@@ -1,11 +1,11 @@
-site_name: rwget
+site_name: rewget
 docs_dir: documentation
 site_description: wget-compatible wrapper with automatic fallback for blocked requests
 site_author: Dipankar Das
-site_url: https://rwget.dev
+site_url: https://rewget.dev
 
-repo_name: dipankardas011/rwget
-repo_url: https://github.com/dipankardas011/rwget
+repo_name: dipankardas011/rewget
+repo_url: https://github.com/dipankardas011/rewget
 
 theme:
   name: material
@@ -77,7 +77,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/dipankardas011/rwget
+      link: https://github.com/dipankardas011/rewget
   version:
     provider: mike
 

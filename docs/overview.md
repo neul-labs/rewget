@@ -1,14 +1,14 @@
 # Overview
 
-rwget is a drop-in wrapper around wget with automatic fallback and an optional daemon. By default, rwget attempts a plain wget request first, then progressively retries with browser emulation when encountering blocking responses (403, 429, etc.). This behavior can be disabled with `--rwget-no-fallback` for scripting.
+rewget is a drop-in wrapper around wget with automatic fallback and an optional daemon. By default, rewget attempts a plain wget request first, then progressively retries with browser emulation when encountering blocking responses (403, 429, etc.). This behavior can be disabled with `--rewget-no-fallback` for scripting.
 
 ## Terminology
 
 - Engine: the pinned wget binary that defines canonical behavior.
-- Shim: the `rwget` CLI that parses `--rwget-*` flags only.
-- Daemon: `rwgetd`, a service process that executes wget jobs and manages browser pool.
-- Transport: the IPC layer used between `rwget` and `rwgetd` (nng).
-- Inline daemon: a foreground `rwgetd` process spawned by `rwget` on first fallback.
+- Shim: the `rewget` CLI that parses `--rewget-*` flags only.
+- Daemon: `rewgetd`, a service process that executes wget jobs and manages browser pool.
+- Transport: the IPC layer used between `rewget` and `rewgetd` (nng).
+- Inline daemon: a foreground `rewgetd` process spawned by `rewget` on first fallback.
 - Fallback: automatic retry with progressive enhancement when wget encounters blocking responses.
 - Preflight: a browser-like request or JS-enabled navigation to obtain cookies and a final URL.
 - Replay: running wget with the original arguments and exported state.
@@ -23,22 +23,22 @@ On successful download (regardless of which stage succeeded):
 - created files, timestamps, and logs match wget behavior.
 - `.wgetrc` and `--config` semantics are unchanged.
 
-With `--rwget-no-fallback`:
+With `--rewget-no-fallback`:
 
 - Behavior is identical to running wget directly.
 - stdout, stderr, and exit code match the engine exactly.
 
 ## Operating modes
 
-- **Stage 1 (Plain wget)**: `rwget` runs `wget_engine` directly. If successful, done. If blocked, proceed to Stage 2.
+- **Stage 1 (Plain wget)**: `rewget` runs `wget_engine` directly. If successful, done. If blocked, proceed to Stage 2.
 - **Stage 2 (Impersonation)**: Uses browser-like headers and TLS fingerprint to obtain cookies and final URL, then replays with wget.
 - **Stage 3 (JS preflight)**: Runs a real browser session to solve challenges, exports cookies, then replays with wget.
 
-The daemon (`rwgetd`) is started inline when Stage 2 or 3 is needed. It manages a warm browser pool for subsequent requests.
+The daemon (`rewgetd`) is started inline when Stage 2 or 3 is needed. It manages a warm browser pool for subsequent requests.
 
 ## Fallback stages
 
-rwget automatically progresses through these stages on failure:
+rewget automatically progresses through these stages on failure:
 
 - **Impersonation preflight (Stage 2)**: uses a browser-like request profile to obtain a final URL, headers, and cookies, then replays with wget.
 - **JS preflight (Stage 3)**: uses a real browser session to solve challenges (Cloudflare, CAPTCHAs) and export cookies before replaying with wget.
@@ -52,17 +52,17 @@ Both stages preserve wget's behavior for recursion, output files, and logging wh
 - Cookies obtained during fallback are accumulated in the session cookie jar.
 - Fallback does not alter wget flags, output paths, or timestamping behavior.
 - The daemon is spawned inline when Stage 2 or 3 is first needed.
-- Fallback messages are printed to stderr (suppressible with `--rwget-quiet`).
+- Fallback messages are printed to stderr (suppressible with `--rewget-quiet`).
 
 ## Timeouts
 
 Each stage has an independent timeout:
 
 - **Stage 1**: Inherits wget's timeout settings (`--timeout`, `--connect-timeout`, etc.)
-- **Stage 2**: 15 seconds default (`--rwget-timeout-stage2`)
-- **Stage 3**: 30 seconds default (`--rwget-timeout-stage3`)
+- **Stage 2**: 15 seconds default (`--rewget-timeout-stage2`)
+- **Stage 3**: 30 seconds default (`--rewget-timeout-stage3`)
 
-When a stage times out, rwget proceeds to the next stage (if available).
+When a stage times out, rewget proceeds to the next stage (if available).
 
 ## Cookie handling
 
@@ -72,25 +72,25 @@ When a stage times out, rwget proceeds to the next stage (if available).
 
 ## Engine selection
 
-rwget supports two wget implementations:
+rewget supports two wget implementations:
 
 | Engine | Flag | Notes |
 |--------|------|-------|
-| GNU Wget | `--rwget-engine=wget` | Default, maximum compatibility |
-| GNU Wget2 | `--rwget-engine=wget2` | HTTP/2 support, modern features |
+| GNU Wget | `--rewget-engine=wget` | Default, maximum compatibility |
+| GNU Wget2 | `--rewget-engine=wget2` | HTTP/2 support, modern features |
 
 Each engine is a separate compliance target with its own golden tests.
 
 ## Domain stage caching
 
-rwget remembers which stage succeeded for each domain:
+rewget remembers which stage succeeded for each domain:
 
 - First request: Stage 1 fails → Stage 2 succeeds → cache `domain → Stage 2`
 - Future requests: Start directly at Stage 2
 
-Cache expires after 7 days. Disable with `--rwget-no-cache`.
+Cache expires after 7 days. Disable with `--rewget-no-cache`.
 
 ## Implementation direction
 
-- Rust is the primary implementation language for `rwget` and `rwgetd`.
+- Rust is the primary implementation language for `rewget` and `rewgetd`.
 - nng is the IPC transport for request and streaming semantics.

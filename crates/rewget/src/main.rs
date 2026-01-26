@@ -1,4 +1,4 @@
-//! rwget - wget-compatible wrapper with automatic fallback
+//! rewget - wget-compatible wrapper with automatic fallback
 
 use mimalloc::MiMalloc;
 
@@ -19,7 +19,7 @@ fn main() -> Result<()> {
 
     match args.command {
         args::Command::Version => {
-            println!("rwget {}", env!("CARGO_PKG_VERSION"));
+            println!("rewget {}", env!("CARGO_PKG_VERSION"));
             Ok(())
         }
         args::Command::Help => {
@@ -62,75 +62,75 @@ fn main() -> Result<()> {
 
 fn print_help() {
     println!(
-        r#"rwget {} - wget-compatible wrapper with automatic fallback
+        r#"rewget {} - wget-compatible wrapper with automatic fallback
 
 USAGE:
-    rwget [RWGET_OPTIONS] [WGET_OPTIONS] [URL...]
+    rewget [RWGET_OPTIONS] [WGET_OPTIONS] [URL...]
 
 DESCRIPTION:
-    rwget is a drop-in replacement for wget that automatically retries
+    rewget is a drop-in replacement for wget that automatically retries
     with browser emulation when sites block standard wget requests.
 
 RWGET OPTIONS:
-    --rwget-no-fallback       Disable fallback, behave exactly like wget
-    --rwget-engine=<ENGINE>   Select wget engine (wget, wget2)
-    --rwget-quiet             Suppress rwget status messages
-    --rwget-debug             Enable verbose debug output
+    --rewget-no-fallback       Disable fallback, behave exactly like wget
+    --rewget-engine=<ENGINE>   Select wget engine (wget, wget2)
+    --rewget-quiet             Suppress rewget status messages
+    --rewget-debug             Enable verbose debug output
 
-    --rwget-fallback-codes=<CODES>
+    --rewget-fallback-codes=<CODES>
                               Comma-separated HTTP codes that trigger fallback
                               Default: 403,429,503,520-529
 
-    --rwget-fallback-stage=<N>
+    --rewget-fallback-stage=<N>
                               Start at stage N (1=wget, 2=impersonate, 3=js)
 
-    --rwget-no-body-detection
+    --rewget-no-body-detection
                               Disable HTML body pattern detection
 
-    --rwget-profile=<NAME>    Use specific browser profile for impersonation
-    --rwget-daemon=<MODE>     Daemon mode: auto, on, off
+    --rewget-profile=<NAME>    Use specific browser profile for impersonation
+    --rewget-daemon=<MODE>     Daemon mode: auto, on, off
 
-    --rwget-timeout-stage1=<MS>   Stage 1 timeout (default: wget settings)
-    --rwget-timeout-stage2=<MS>   Stage 2 timeout (default: 15000)
-    --rwget-timeout-stage3=<MS>   Stage 3 timeout (default: 30000)
+    --rewget-timeout-stage1=<MS>   Stage 1 timeout (default: wget settings)
+    --rewget-timeout-stage2=<MS>   Stage 2 timeout (default: 15000)
+    --rewget-timeout-stage3=<MS>   Stage 3 timeout (default: 30000)
 
-    --rwget-no-cache          Disable domain stage caching
-    --rwget-clear-cache       Clear stage cache and exit
+    --rewget-no-cache          Disable domain stage caching
+    --rewget-clear-cache       Clear stage cache and exit
 
-    --rwget-js                Force JS preflight (Stage 3)
-    --rwget-js-wait=<COND>    Wait condition for JS preflight
+    --rewget-js                Force JS preflight (Stage 3)
+    --rewget-js-wait=<COND>    Wait condition for JS preflight
 
-    --rwget-update-profiles   Update browser fingerprint profiles from remote
-    --rwget-profile-url=<URL> Custom profile update URL
-    --rwget-no-verify         Skip Ed25519 signature verification
-    --rwget-list-profiles     List available profiles
-    --rwget-verify-profile=<NAME>
+    --rewget-update-profiles   Update browser fingerprint profiles from remote
+    --rewget-profile-url=<URL> Custom profile update URL
+    --rewget-no-verify         Skip Ed25519 signature verification
+    --rewget-list-profiles     List available profiles
+    --rewget-verify-profile=<NAME>
                               Verify profile fingerprints
 
-    --rwget-download-chromium Pre-download Chromium for JS preflight
-    --rwget-chromium-path     Print Chromium installation path
+    --rewget-download-chromium Pre-download Chromium for JS preflight
+    --rewget-chromium-path     Print Chromium installation path
 
-    --rwget-completions=<SHELL>
+    --rewget-completions=<SHELL>
                               Generate shell completions (bash, zsh, fish, powershell)
 
-    --rwget-version           Print rwget version
-    --rwget-help              Print this help message
+    --rewget-version           Print rewget version
+    --rewget-help              Print this help message
 
 ENVIRONMENT:
     RWGET_ENGINE              Default engine (wget or wget2)
 
 EXAMPLES:
     # Download with automatic fallback
-    rwget https://example.com/file.tar.gz
+    rewget https://example.com/file.tar.gz
 
     # Strict mode (no fallback)
-    rwget --rwget-no-fallback https://example.com/file.tar.gz
+    rewget --rewget-no-fallback https://example.com/file.tar.gz
 
     # Use wget2 engine
-    rwget --rwget-engine=wget2 https://example.com/file.tar.gz
+    rewget --rewget-engine=wget2 https://example.com/file.tar.gz
 
     # Force Stage 3 (JS preflight)
-    rwget --rwget-js https://protected-site.com/
+    rewget --rewget-js https://protected-site.com/
 
 For wget options, run: wget --help
 "#,
@@ -139,22 +139,22 @@ For wget options, run: wget --help
 }
 
 fn clear_cache() -> Result<()> {
-    let mut cache = rwget_core::DomainCache::load();
+    let mut cache = rewget_core::DomainCache::load();
     let count = cache.len();
 
     if count > 0 {
         cache.clear();
         cache.save()?;
-        eprintln!("[rwget] Cleared {} cached domain entries", count);
+        eprintln!("[rewget] Cleared {} cached domain entries", count);
     } else {
-        eprintln!("[rwget] Cache is empty");
+        eprintln!("[rewget] Cache is empty");
     }
 
     Ok(())
 }
 
 fn list_profiles() -> Result<()> {
-    use rwget_core::ProfileCollection;
+    use rewget_core::ProfileCollection;
 
     // Initialize defaults if needed
     let _ = ProfileCollection::init_defaults();
@@ -162,7 +162,7 @@ fn list_profiles() -> Result<()> {
     let collection = ProfileCollection::load();
 
     if collection.profiles.is_empty() {
-        eprintln!("[rwget] No profiles found");
+        eprintln!("[rewget] No profiles found");
         return Ok(());
     }
 
@@ -183,60 +183,60 @@ fn list_profiles() -> Result<()> {
 
     println!("Total: {} profiles", collection.profiles.len());
     println!();
-    println!("Usage: rwget --rwget-profile=<name> <url>");
+    println!("Usage: rewget --rewget-profile=<name> <url>");
 
     Ok(())
 }
 
 fn update_profiles(url: Option<&str>, no_verify: bool) -> Result<()> {
-    use rwget_core::{ProfileCollection, DEFAULT_PROFILE_URL};
+    use rewget_core::{ProfileCollection, DEFAULT_PROFILE_URL};
 
     let source_url = url.unwrap_or(DEFAULT_PROFILE_URL);
-    eprintln!("[rwget] Fetching profiles from: {}", source_url);
+    eprintln!("[rewget] Fetching profiles from: {}", source_url);
 
     if no_verify {
-        eprintln!("[rwget] Warning: Signature verification disabled");
+        eprintln!("[rewget] Warning: Signature verification disabled");
     }
 
     match ProfileCollection::update_from_remote(url, !no_verify) {
         Ok(result) => {
             if !result.updated.is_empty() {
-                eprintln!("[rwget] Updated: {}", result.updated.join(", "));
+                eprintln!("[rewget] Updated: {}", result.updated.join(", "));
             }
             if !result.added.is_empty() {
-                eprintln!("[rwget] Added: {}", result.added.join(", "));
+                eprintln!("[rewget] Added: {}", result.added.join(", "));
             }
             if result.unchanged > 0 {
-                eprintln!("[rwget] Unchanged: {} profiles", result.unchanged);
+                eprintln!("[rewget] Unchanged: {} profiles", result.unchanged);
             }
-            eprintln!("[rwget] Total: {} profiles", result.total);
-            eprintln!("[rwget] Profiles saved to: {}", ProfileCollection::builtin_path().display());
+            eprintln!("[rewget] Total: {} profiles", result.total);
+            eprintln!("[rewget] Profiles saved to: {}", ProfileCollection::builtin_path().display());
             Ok(())
         }
         Err(e) => {
             // If remote fails, offer to reset to defaults
-            eprintln!("[rwget] Remote update failed: {}", e);
-            eprintln!("[rwget] Falling back to built-in defaults...");
+            eprintln!("[rewget] Remote update failed: {}", e);
+            eprintln!("[rewget] Falling back to built-in defaults...");
 
             let collection = ProfileCollection::default_profiles();
             collection.save_builtin()?;
 
-            eprintln!("[rwget] Reset to {} built-in profiles", collection.profiles.len());
+            eprintln!("[rewget] Reset to {} built-in profiles", collection.profiles.len());
             Ok(())
         }
     }
 }
 
 fn download_chromium() -> Result<()> {
-    use rwget_core::{chromium_installed, chromium_path, download_chromium as do_download, CHROMIUM_VERSION};
+    use rewget_core::{chromium_installed, chromium_path, download_chromium as do_download, CHROMIUM_VERSION};
 
     if chromium_installed() {
-        eprintln!("[rwget] Chromium already installed at: {}", chromium_path().display());
+        eprintln!("[rewget] Chromium already installed at: {}", chromium_path().display());
         return Ok(());
     }
 
-    eprintln!("[rwget] Downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
-    eprintln!("[rwget] This is approximately 150MB and only needs to be done once.");
+    eprintln!("[rewget] Downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
+    eprintln!("[rewget] This is approximately 150MB and only needs to be done once.");
     eprintln!();
 
     match do_download(|_downloaded, _total| {
@@ -244,34 +244,34 @@ fn download_chromium() -> Result<()> {
     }) {
         Ok(_) => {
             eprintln!();
-            eprintln!("[rwget] Chromium installed at: {}", chromium_path().display());
+            eprintln!("[rewget] Chromium installed at: {}", chromium_path().display());
             Ok(())
         }
         Err(e) => {
-            eprintln!("[rwget] Download failed: {}", e);
+            eprintln!("[rewget] Download failed: {}", e);
             Err(anyhow::anyhow!("Chromium download failed: {}", e))
         }
     }
 }
 
 fn print_chromium_path() {
-    use rwget_core::chromium_path;
+    use rewget_core::chromium_path;
 
-    let status = rwget_core::ChromiumStatus::check();
+    let status = rewget_core::ChromiumStatus::check();
 
     if status.installed {
         println!("{}", status.path.display());
         if let Some(version) = status.version {
-            eprintln!("[rwget] Version: {}", version);
+            eprintln!("[rewget] Version: {}", version);
         }
     } else {
         println!("{}", chromium_path().display());
-        eprintln!("[rwget] Chromium not installed. Run: rwget --rwget-download-chromium");
+        eprintln!("[rewget] Chromium not installed. Run: rewget --rewget-download-chromium");
     }
 }
 
 fn verify_profile(name: &str) -> Result<()> {
-    use rwget_core::ProfileCollection;
+    use rewget_core::ProfileCollection;
 
     let _ = ProfileCollection::init_defaults();
     let collection = ProfileCollection::load();
@@ -327,11 +327,11 @@ fn verify_profile(name: &str) -> Result<()> {
             }
 
             println!();
-            println!("[rwget] Profile '{}' is valid", name);
+            println!("[rewget] Profile '{}' is valid", name);
             Ok(())
         }
         None => {
-            eprintln!("[rwget] Profile '{}' not found", name);
+            eprintln!("[rewget] Profile '{}' not found", name);
             eprintln!();
             eprintln!("Available profiles:");
             for pname in collection.list_names() {

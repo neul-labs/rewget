@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to rwget!
+Thank you for your interest in contributing to rewget!
 
 ## Getting Started
 
@@ -13,8 +13,8 @@ Thank you for your interest in contributing to rwget!
 ### Clone and Build
 
 ```bash
-git clone https://github.com/dipankardas011/rwget
-cd rwget
+git clone https://github.com/dipankardas011/rewget
+cd rewget
 cargo build
 ```
 
@@ -27,17 +27,17 @@ cargo test
 ### Run with Debug Output
 
 ```bash
-cargo run -- --rwget-debug https://example.com/
+cargo run -- --rewget-debug https://example.com/
 ```
 
 ## Project Structure
 
 ```
-rwget/
+rewget/
 ├── crates/
-│   ├── rwget/           # CLI binary
-│   ├── rwgetd/          # Daemon binary
-│   └── rwget-core/      # Shared library
+│   ├── rewget/           # CLI binary
+│   ├── rewgetd/          # Daemon binary
+│   └── rewget-core/      # Shared library
 ├── documentation/       # MkDocs documentation
 ├── Formula/            # Homebrew formula
 └── scripts/            # Build scripts
@@ -47,17 +47,17 @@ rwget/
 
 ### Reporting Bugs
 
-1. Check [existing issues](https://github.com/dipankardas011/rwget/issues) first
+1. Check [existing issues](https://github.com/dipankardas011/rewget/issues) first
 2. Create a new issue with:
-   - rwget version (`rwget --rwget-version`)
+   - rewget version (`rewget --rewget-version`)
    - Operating system and version
    - Steps to reproduce
-   - Debug output (`--rwget-debug`)
+   - Debug output (`--rewget-debug`)
    - Expected vs actual behavior
 
 ### Suggesting Features
 
-1. Open a [new issue](https://github.com/dipankardas011/rwget/issues/new)
+1. Open a [new issue](https://github.com/dipankardas011/rewget/issues/new)
 2. Describe the feature and use case
 3. Explain why it would be useful
 
@@ -97,7 +97,7 @@ Use clear, descriptive commit messages:
 ```
 Add Stage 2 timeout configuration
 
-- Add --rwget-timeout-stage2 flag
+- Add --rewget-timeout-stage2 flag
 - Default to 15 seconds
 - Update documentation
 ```
@@ -112,26 +112,26 @@ Add Stage 2 timeout configuration
 
 ### Adding a New CLI Flag
 
-1. Add to `crates/rwget/src/args.rs`:
+1. Add to `crates/rewget/src/args.rs`:
    ```rust
    "my-flag" => {
-       let v = value.ok_or_else(|| anyhow!("--rwget-my-flag requires a value"))?;
+       let v = value.ok_or_else(|| anyhow!("--rewget-my-flag requires a value"))?;
        config.my_setting = v.parse()?;
    }
    ```
 
-2. Add to `crates/rwget-core/src/config.rs`:
+2. Add to `crates/rewget-core/src/config.rs`:
    ```rust
    pub struct Config {
        pub my_setting: String,
    }
    ```
 
-3. Add to `crates/rwget/src/cli.rs` for completions:
+3. Add to `crates/rewget/src/cli.rs` for completions:
    ```rust
    .arg(
        Arg::new("my-flag")
-           .long("rwget-my-flag")
+           .long("rewget-my-flag")
            .value_name("VALUE")
            .help("Description of my flag")
    )
@@ -141,7 +141,7 @@ Add Stage 2 timeout configuration
 
 ### Adding a Detection Pattern
 
-Edit `crates/rwget-core/src/detection.rs`:
+Edit `crates/rewget-core/src/detection.rs`:
 
 ```rust
 pub const BLOCK_PATTERNS: &[&str] = &[
@@ -153,7 +153,7 @@ pub const BLOCK_PATTERNS: &[&str] = &[
 ### Adding a Browser Profile
 
 1. Create profile JSON following the format in `profiles.md`
-2. Add to `crates/rwget-core/src/profile.rs`:
+2. Add to `crates/rewget-core/src/profile.rs`:
    ```rust
    fn default_profiles() -> Vec<Profile> {
        vec![
@@ -169,10 +169,10 @@ For development, you can test against sites known to have bot protection:
 
 ```bash
 # Test impersonation
-cargo run -- --rwget-debug https://nowsecure.nl/
+cargo run -- --rewget-debug https://nowsecure.nl/
 
 # Test different profiles
-cargo run -- --rwget-profile=firefox_136 --rwget-debug https://example.com/
+cargo run -- --rewget-profile=firefox_136 --rewget-debug https://example.com/
 ```
 
 ## Areas for Contribution
@@ -224,8 +224,8 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ## Getting Help
 
-- **Questions**: Open a [discussion](https://github.com/dipankardas011/rwget/discussions)
-- **Bugs**: Open an [issue](https://github.com/dipankardas011/rwget/issues)
-- **Security**: Email security@rwget.dev
+- **Questions**: Open a [discussion](https://github.com/dipankardas011/rewget/discussions)
+- **Bugs**: Open an [issue](https://github.com/dipankardas011/rewget/issues)
+- **Security**: Email security@rewget.dev
 
-Thank you for contributing to rwget!
+Thank you for contributing to rewget!

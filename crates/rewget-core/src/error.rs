@@ -1,4 +1,4 @@
-//! Error types for rwget
+//! Error types for rewget
 
 use thiserror::Error;
 

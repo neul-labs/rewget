@@ -1,19 +1,19 @@
 # Installation
 
-rwget is distributed as a single binary per platform. After installation, you can optionally configure your system to use rwget as the default wget.
+rewget is distributed as a single binary per platform. After installation, you can optionally configure your system to use rewget as the default wget.
 
 ## Quick Install
 
 ### Linux / macOS
 
 ```bash
-curl -fsSL https://rwget.dev/install.sh | sh
+curl -fsSL https://rewget.dev/install.sh | sh
 ```
 
 ### Windows
 
 ```powershell
-irm https://rwget.dev/install.ps1 | iex
+irm https://rewget.dev/install.ps1 | iex
 ```
 
 ## Manual Installation
@@ -22,30 +22,30 @@ irm https://rwget.dev/install.ps1 | iex
 
 | Platform | Architecture | Download |
 |----------|--------------|----------|
-| Linux | x86_64 | [rwget-linux-x86_64.tar.gz](https://github.com/user/rwget/releases/latest) |
-| Linux | arm64 | [rwget-linux-arm64.tar.gz](https://github.com/user/rwget/releases/latest) |
-| macOS | x86_64 (Intel) | [rwget-darwin-x86_64.tar.gz](https://github.com/user/rwget/releases/latest) |
-| macOS | arm64 (Apple Silicon) | [rwget-darwin-arm64.tar.gz](https://github.com/user/rwget/releases/latest) |
-| Windows | x86_64 | [rwget-windows-x86_64.zip](https://github.com/user/rwget/releases/latest) |
+| Linux | x86_64 | [rewget-linux-x86_64.tar.gz](https://github.com/user/rewget/releases/latest) |
+| Linux | arm64 | [rewget-linux-arm64.tar.gz](https://github.com/user/rewget/releases/latest) |
+| macOS | x86_64 (Intel) | [rewget-darwin-x86_64.tar.gz](https://github.com/user/rewget/releases/latest) |
+| macOS | arm64 (Apple Silicon) | [rewget-darwin-arm64.tar.gz](https://github.com/user/rewget/releases/latest) |
+| Windows | x86_64 | [rewget-windows-x86_64.zip](https://github.com/user/rewget/releases/latest) |
 
 ### Extract and Install
 
 **Linux / macOS:**
 ```bash
-tar -xzf rwget-*.tar.gz
-sudo mv rwget /usr/local/bin/
-sudo mv rwgetd /usr/local/bin/
+tar -xzf rewget-*.tar.gz
+sudo mv rewget /usr/local/bin/
+sudo mv rewgetd /usr/local/bin/
 ```
 
 **Windows:**
 ```powershell
-Expand-Archive rwget-windows-x86_64.zip -DestinationPath C:\Program Files\rwget
+Expand-Archive rewget-windows-x86_64.zip -DestinationPath C:\Program Files\rewget
 # Add to PATH via System Properties > Environment Variables
 ```
 
-## Replacing wget with rwget
+## Replacing wget with rewget
 
-rwget is designed to be a drop-in replacement for wget. You can configure your system to use rwget whenever you type `wget`.
+rewget is designed to be a drop-in replacement for wget. You can configure your system to use rewget whenever you type `wget`.
 
 ### Option 1: Shell Alias (Recommended)
 
@@ -53,22 +53,22 @@ The simplest approach. Add an alias to your shell configuration.
 
 **Bash (~/.bashrc):**
 ```bash
-alias wget='rwget'
+alias wget='rewget'
 ```
 
 **Zsh (~/.zshrc):**
 ```zsh
-alias wget='rwget'
+alias wget='rewget'
 ```
 
 **Fish (~/.config/fish/config.fish):**
 ```fish
-alias wget='rwget'
+alias wget='rewget'
 ```
 
 **PowerShell ($PROFILE):**
 ```powershell
-Set-Alias -Name wget -Value rwget
+Set-Alias -Name wget -Value rewget
 ```
 
 After adding, reload your shell:
@@ -78,7 +78,7 @@ source ~/.bashrc  # or ~/.zshrc
 
 ### Option 2: Symlink (System-wide)
 
-Create a symlink so all users and scripts use rwget.
+Create a symlink so all users and scripts use rewget.
 
 **Linux / macOS:**
 ```bash
@@ -86,7 +86,7 @@ Create a symlink so all users and scripts use rwget.
 sudo mv /usr/bin/wget /usr/bin/wget.orig
 
 # Create symlink
-sudo ln -s /usr/local/bin/rwget /usr/bin/wget
+sudo ln -s /usr/local/bin/rewget /usr/bin/wget
 ```
 
 **To restore original wget:**
@@ -97,15 +97,15 @@ sudo mv /usr/bin/wget.orig /usr/bin/wget
 
 ### Option 3: PATH Priority
 
-Place rwget earlier in your PATH than the system wget.
+Place rewget earlier in your PATH than the system wget.
 
 **Linux / macOS:**
 ```bash
 # Add to ~/.bashrc or ~/.zshrc
 export PATH="$HOME/.local/bin:$PATH"
 
-# Then symlink rwget
-ln -s /usr/local/bin/rwget ~/.local/bin/wget
+# Then symlink rewget
+ln -s /usr/local/bin/rewget ~/.local/bin/wget
 ```
 
 ### Option 4: Wrapper Script
@@ -115,7 +115,7 @@ For more control, create a wrapper script.
 **Linux / macOS (/usr/local/bin/wget):**
 ```bash
 #!/bin/bash
-exec rwget "$@"
+exec rewget "$@"
 ```
 
 ```bash
@@ -135,14 +135,14 @@ sudo chmod +x /usr/local/bin/wget
 which wget
 # /usr/bin/wget
 
-# rwget installs to
-# /usr/local/bin/rwget
+# rewget installs to
+# /usr/local/bin/rewget
 ```
 
 **Arch Linux:**
 ```bash
 # AUR package available (once published)
-yay -S rwget
+yay -S rewget
 ```
 
 ### macOS
@@ -153,18 +153,18 @@ yay -S rwget
 # or /usr/local/bin/wget (Intel)
 
 # Option A: Alias (doesn't affect Homebrew)
-alias wget='rwget'
+alias wget='rewget'
 
 # Option B: Unlink Homebrew wget
 brew unlink wget
-ln -s /usr/local/bin/rwget /usr/local/bin/wget
+ln -s /usr/local/bin/rewget /usr/local/bin/wget
 ```
 
 **Without Homebrew:**
 ```bash
 # macOS doesn't include wget by default
-# Just install rwget and alias it
-alias wget='rwget'
+# Just install rewget and alias it
+alias wget='rewget'
 ```
 
 ### Windows
@@ -172,30 +172,30 @@ alias wget='rwget'
 **PowerShell:**
 ```powershell
 # Add to $PROFILE
-function wget { rwget.exe @args }
+function wget { rewget.exe @args }
 
 # Or use Set-Alias
-Set-Alias -Name wget -Value rwget.exe
+Set-Alias -Name wget -Value rewget.exe
 ```
 
 **CMD:**
 ```batch
 :: Create wget.bat in a PATH directory
 @echo off
-rwget.exe %*
+rewget.exe %*
 ```
 
 **Git Bash / MSYS2:**
 ```bash
 # Same as Linux
-alias wget='rwget'
+alias wget='rewget'
 ```
 
 **WSL:**
 ```bash
 # WSL uses Linux instructions
 # Install the Linux binary, not Windows
-alias wget='rwget'
+alias wget='rewget'
 ```
 
 ## Verifying Installation
@@ -204,14 +204,14 @@ After installation and aliasing:
 
 ```bash
 # Check version
-rwget --version
+rewget --version
 
 # Verify alias works
 wget --version
-# Should show rwget version, not GNU wget
+# Should show rewget version, not GNU wget
 
 # Test fallback
-rwget --rwget-debug https://example.com/
+rewget --rewget-debug https://example.com/
 ```
 
 ## Uninstallation
@@ -220,17 +220,17 @@ rwget --rwget-debug https://example.com/
 
 **Linux / macOS:**
 ```bash
-sudo rm /usr/local/bin/rwget
-sudo rm /usr/local/bin/rwgetd
-rm -rf ~/.config/rwget
-rm -rf ~/.local/share/rwget
-rm -rf ~/.cache/rwget
+sudo rm /usr/local/bin/rewget
+sudo rm /usr/local/bin/rewgetd
+rm -rf ~/.config/rewget
+rm -rf ~/.local/share/rewget
+rm -rf ~/.cache/rewget
 ```
 
 **Windows:**
 ```powershell
-Remove-Item "C:\Program Files\rwget" -Recurse
-Remove-Item "$env:APPDATA\rwget" -Recurse
+Remove-Item "C:\Program Files\rewget" -Recurse
+Remove-Item "$env:APPDATA\rewget" -Recurse
 ```
 
 ### Remove Alias
@@ -247,13 +247,13 @@ sudo mv /usr/bin/wget.orig /usr/bin/wget
 
 ## Configuration
 
-rwget uses these configuration locations:
+rewget uses these configuration locations:
 
 | Platform | Config | Data |
 |----------|--------|------|
-| Linux | `~/.config/rwget/` | `~/.local/share/rwget/` |
-| macOS | `~/Library/Application Support/rwget/` | Same |
-| Windows | `%APPDATA%\rwget\` | Same |
+| Linux | `~/.config/rewget/` | `~/.local/share/rewget/` |
+| macOS | `~/Library/Application Support/rewget/` | Same |
+| Windows | `%APPDATA%\rewget\` | Same |
 
 ### Config File
 
@@ -275,7 +275,7 @@ auto_update = true
 
 ## Troubleshooting
 
-### "rwget: command not found"
+### "rewget: command not found"
 
 Ensure `/usr/local/bin` is in your PATH:
 ```bash
@@ -286,11 +286,11 @@ echo $PATH | tr ':' '\n' | grep local
 
 Shell aliases don't work in non-interactive scripts. Use:
 - The symlink approach, or
-- Call `rwget` directly in scripts
+- Call `rewget` directly in scripts
 
 ### Homebrew conflicts
 
-If Homebrew wget shadows rwget:
+If Homebrew wget shadows rewget:
 ```bash
 # Check which wget is being used
 which wget
@@ -302,7 +302,7 @@ type wget
 
 ### Windows PATH issues
 
-Ensure rwget directory is in PATH:
+Ensure rewget directory is in PATH:
 ```powershell
-$env:PATH -split ';' | Select-String rwget
+$env:PATH -split ';' | Select-String rewget
 ```

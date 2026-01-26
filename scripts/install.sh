@@ -1,12 +1,12 @@
 #!/bin/bash
-# Install script for rwget
-# Usage: curl -sSL https://rwget.dev/install.sh | bash
+# Install script for rewget
+# Usage: curl -sSL https://rewget.dev/install.sh | bash
 
 set -e
 
 VERSION="${RWGET_VERSION:-1.0.0}"
 INSTALL_DIR="${RWGET_INSTALL_DIR:-$HOME/.local/bin}"
-GITHUB_REPO="dipankardas011/rwget"
+GITHUB_REPO="dipankardas011/rewget"
 
 # Detect OS and architecture
 detect_platform() {
@@ -35,10 +35,10 @@ detect_platform() {
 }
 
 PLATFORM=$(detect_platform)
-TARBALL="rwget-${PLATFORM}.tar.gz"
+TARBALL="rewget-${PLATFORM}.tar.gz"
 DOWNLOAD_URL="https://github.com/${GITHUB_REPO}/releases/download/v${VERSION}/${TARBALL}"
 
-echo "rwget installer v${VERSION}"
+echo "rewget installer v${VERSION}"
 echo ""
 echo "Platform: ${PLATFORM}"
 echo "Installing to: ${INSTALL_DIR}"
@@ -73,13 +73,13 @@ if [[ ! -d "${EXTRACT_DIR}" ]]; then
 fi
 
 echo "Installing binaries..."
-install -m 755 "${EXTRACT_DIR}/rwget" "${INSTALL_DIR}/rwget"
-install -m 755 "${EXTRACT_DIR}/rwgetd" "${INSTALL_DIR}/rwgetd"
+install -m 755 "${EXTRACT_DIR}/rewget" "${INSTALL_DIR}/rewget"
+install -m 755 "${EXTRACT_DIR}/rewgetd" "${INSTALL_DIR}/rewgetd"
 
 # Install man page if available
-if [[ -f "${EXTRACT_DIR}/rwget.1" ]] && [[ -d "${HOME}/.local/share/man/man1" ]]; then
+if [[ -f "${EXTRACT_DIR}/rewget.1" ]] && [[ -d "${HOME}/.local/share/man/man1" ]]; then
     mkdir -p "${HOME}/.local/share/man/man1"
-    install -m 644 "${EXTRACT_DIR}/rwget.1" "${HOME}/.local/share/man/man1/"
+    install -m 644 "${EXTRACT_DIR}/rewget.1" "${HOME}/.local/share/man/man1/"
 fi
 
 echo ""
@@ -98,7 +98,7 @@ if [[ ":${PATH}:" != *":${INSTALL_DIR}:"* ]]; then
 fi
 
 echo "Verify installation:"
-echo "  rwget --rwget-version"
+echo "  rewget --rewget-version"
 echo ""
 echo "Get started:"
-echo "  rwget --rwget-help"
+echo "  rewget --rewget-help"

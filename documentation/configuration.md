@@ -1,6 +1,6 @@
 # Configuration
 
-rwget can be configured through command-line flags and environment variables.
+rewget can be configured through command-line flags and environment variables.
 
 ## Environment Variables
 
@@ -10,19 +10,19 @@ rwget can be configured through command-line flags and environment variables.
 
 ## Command-Line Flags
 
-All rwget-specific flags use the `--rwget-*` prefix to avoid conflicts with wget flags.
+All rewget-specific flags use the `--rewget-*` prefix to avoid conflicts with wget flags.
 
 ### Core Options
 
-#### `--rwget-no-fallback`
+#### `--rewget-no-fallback`
 
-Disable fallback completely. rwget behaves exactly like wget.
+Disable fallback completely. rewget behaves exactly like wget.
 
 ```bash
-rwget --rwget-no-fallback https://example.com/
+rewget --rewget-no-fallback https://example.com/
 ```
 
-#### `--rwget-engine=ENGINE`
+#### `--rewget-engine=ENGINE`
 
 Select the wget engine to use.
 
@@ -32,38 +32,38 @@ Select the wget engine to use.
 | `wget2` | GNU Wget2 |
 
 ```bash
-rwget --rwget-engine=wget2 https://example.com/
+rewget --rewget-engine=wget2 https://example.com/
 ```
 
-#### `--rwget-quiet`
+#### `--rewget-quiet`
 
-Suppress rwget status messages. wget's output is unchanged.
+Suppress rewget status messages. wget's output is unchanged.
 
 ```bash
-rwget --rwget-quiet https://example.com/
+rewget --rewget-quiet https://example.com/
 ```
 
-#### `--rwget-debug`
+#### `--rewget-debug`
 
 Enable verbose debug output for troubleshooting.
 
 ```bash
-rwget --rwget-debug https://example.com/
+rewget --rewget-debug https://example.com/
 ```
 
 ### Fallback Control
 
-#### `--rwget-fallback-codes=CODES`
+#### `--rewget-fallback-codes=CODES`
 
 Comma-separated HTTP status codes that trigger fallback.
 
 **Default**: `403,429,503,520,521,522,523,524,525,526,527,528,529`
 
 ```bash
-rwget --rwget-fallback-codes=403,429 https://example.com/
+rewget --rewget-fallback-codes=403,429 https://example.com/
 ```
 
-#### `--rwget-fallback-stage=N`
+#### `--rewget-fallback-stage=N`
 
 Start at a specific stage instead of Stage 1.
 
@@ -74,25 +74,25 @@ Start at a specific stage instead of Stage 1.
 | `3` | JavaScript preflight |
 
 ```bash
-rwget --rwget-fallback-stage=2 https://example.com/
+rewget --rewget-fallback-stage=2 https://example.com/
 ```
 
-#### `--rwget-no-body-detection`
+#### `--rewget-no-body-detection`
 
 Disable HTML body pattern detection for bot protection signatures.
 
 ```bash
-rwget --rwget-no-body-detection https://example.com/
+rewget --rewget-no-body-detection https://example.com/
 ```
 
 ### Browser Profile Options
 
-#### `--rwget-profile=NAME`
+#### `--rewget-profile=NAME`
 
 Use a specific browser profile for impersonation.
 
 ```bash
-rwget --rwget-profile=chrome_131 https://example.com/
+rewget --rewget-profile=chrome_131 https://example.com/
 ```
 
 Available profiles:
@@ -106,31 +106,31 @@ Available profiles:
 | `safari_18` | Safari 18 on macOS |
 | `edge_131` | Edge 131 on Windows |
 
-#### `--rwget-list-profiles`
+#### `--rewget-list-profiles`
 
 List all available browser profiles.
 
 ```bash
-rwget --rwget-list-profiles
+rewget --rewget-list-profiles
 ```
 
-#### `--rwget-update-profiles`
+#### `--rewget-update-profiles`
 
 Update browser profiles from the remote server.
 
 ```bash
-rwget --rwget-update-profiles
+rewget --rewget-update-profiles
 ```
 
-#### `--rwget-profile-url=URL`
+#### `--rewget-profile-url=URL`
 
 Custom URL for profile updates.
 
 ```bash
-rwget --rwget-profile-url=https://my-server.com/profiles.json --rwget-update-profiles
+rewget --rewget-profile-url=https://my-server.com/profiles.json --rewget-update-profiles
 ```
 
-#### `--rwget-no-verify`
+#### `--rewget-no-verify`
 
 Skip Ed25519 signature verification when updating profiles.
 
@@ -138,28 +138,28 @@ Skip Ed25519 signature verification when updating profiles.
     Only use this for testing or with trusted profile sources.
 
 ```bash
-rwget --rwget-no-verify --rwget-update-profiles
+rewget --rewget-no-verify --rewget-update-profiles
 ```
 
-#### `--rwget-verify-profile=NAME`
+#### `--rewget-verify-profile=NAME`
 
 Display detailed fingerprint information for a profile.
 
 ```bash
-rwget --rwget-verify-profile=chrome_131
+rewget --rewget-verify-profile=chrome_131
 ```
 
 ### JavaScript Preflight Options
 
-#### `--rwget-js`
+#### `--rewget-js`
 
 Force JavaScript preflight (Stage 3) from the start.
 
 ```bash
-rwget --rwget-js https://example.com/
+rewget --rewget-js https://example.com/
 ```
 
-#### `--rwget-js-wait=CONDITION`
+#### `--rewget-js-wait=CONDITION`
 
 Wait condition for JavaScript preflight.
 
@@ -170,78 +170,78 @@ Wait condition for JavaScript preflight.
 | `delay:MS` | Wait fixed milliseconds |
 
 ```bash
-rwget --rwget-js --rwget-js-wait=networkidle https://example.com/
-rwget --rwget-js --rwget-js-wait=selector:#main-content https://example.com/
-rwget --rwget-js --rwget-js-wait=delay:5000 https://example.com/
+rewget --rewget-js --rewget-js-wait=networkidle https://example.com/
+rewget --rewget-js --rewget-js-wait=selector:#main-content https://example.com/
+rewget --rewget-js --rewget-js-wait=delay:5000 https://example.com/
 ```
 
-#### `--rwget-download-chromium`
+#### `--rewget-download-chromium`
 
 Pre-download Chromium for JavaScript preflight.
 
 ```bash
-rwget --rwget-download-chromium
+rewget --rewget-download-chromium
 ```
 
-#### `--rwget-chromium-path`
+#### `--rewget-chromium-path`
 
 Print the Chromium installation path.
 
 ```bash
-rwget --rwget-chromium-path
+rewget --rewget-chromium-path
 ```
 
 ### Timeout Options
 
-#### `--rwget-timeout-stage1=MS`
+#### `--rewget-timeout-stage1=MS`
 
 Stage 1 timeout in milliseconds. Uses wget's timeout settings by default.
 
 ```bash
-rwget --rwget-timeout-stage1=30000 https://example.com/
+rewget --rewget-timeout-stage1=30000 https://example.com/
 ```
 
-#### `--rwget-timeout-stage2=MS`
+#### `--rewget-timeout-stage2=MS`
 
 Stage 2 timeout in milliseconds.
 
 **Default**: `15000` (15 seconds)
 
 ```bash
-rwget --rwget-timeout-stage2=30000 https://example.com/
+rewget --rewget-timeout-stage2=30000 https://example.com/
 ```
 
-#### `--rwget-timeout-stage3=MS`
+#### `--rewget-timeout-stage3=MS`
 
 Stage 3 timeout in milliseconds.
 
 **Default**: `30000` (30 seconds)
 
 ```bash
-rwget --rwget-timeout-stage3=60000 https://example.com/
+rewget --rewget-timeout-stage3=60000 https://example.com/
 ```
 
 ### Cache Options
 
-#### `--rwget-no-cache`
+#### `--rewget-no-cache`
 
 Disable domain stage caching. Always start at Stage 1.
 
 ```bash
-rwget --rwget-no-cache https://example.com/
+rewget --rewget-no-cache https://example.com/
 ```
 
-#### `--rwget-clear-cache`
+#### `--rewget-clear-cache`
 
 Clear the domain stage cache and exit.
 
 ```bash
-rwget --rwget-clear-cache
+rewget --rewget-clear-cache
 ```
 
 ### Daemon Options
 
-#### `--rwget-daemon=MODE`
+#### `--rewget-daemon=MODE`
 
 Control daemon behavior.
 
@@ -252,28 +252,28 @@ Control daemon behavior.
 | `off` | Never use daemon (Stage 1 only) |
 
 ```bash
-rwget --rwget-daemon=on https://example.com/
+rewget --rewget-daemon=on https://example.com/
 ```
 
 ### Information Options
 
-#### `--rwget-version`
+#### `--rewget-version`
 
-Print rwget version and exit.
+Print rewget version and exit.
 
 ```bash
-rwget --rwget-version
+rewget --rewget-version
 ```
 
-#### `--rwget-help`
+#### `--rewget-help`
 
 Print help message and exit.
 
 ```bash
-rwget --rwget-help
+rewget --rewget-help
 ```
 
-#### `--rwget-completions=SHELL`
+#### `--rewget-completions=SHELL`
 
 Generate shell completions.
 
@@ -285,16 +285,16 @@ Generate shell completions.
 | PowerShell | `powershell` |
 
 ```bash
-rwget --rwget-completions=bash
+rewget --rewget-completions=bash
 ```
 
 ## File Locations
 
 | File | Location | Description |
 |------|----------|-------------|
-| Stage cache | `~/.cache/rwget/stage-cache.json` | Domain → stage mapping |
-| Profiles | `~/.local/share/rwget/profiles/` | Browser profile definitions |
-| Chromium | `~/.local/share/rwget/chromium/` | Chrome for Testing installation |
+| Stage cache | `~/.cache/rewget/stage-cache.json` | Domain → stage mapping |
+| Profiles | `~/.local/share/rewget/profiles/` | Browser profile definitions |
+| Chromium | `~/.local/share/rewget/chromium/` | Chrome for Testing installation |
 
 ## Configuration Precedence
 

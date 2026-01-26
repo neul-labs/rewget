@@ -1,86 +1,86 @@
 # CLI Reference
 
-Complete reference for all rwget command-line options.
+Complete reference for all rewget command-line options.
 
 ## Synopsis
 
 ```
-rwget [RWGET_OPTIONS] [WGET_OPTIONS] [URL...]
+rewget [RWGET_OPTIONS] [WGET_OPTIONS] [URL...]
 ```
 
-rwget accepts all wget options unchanged. Options starting with `--rwget-*` are processed by rwget; all others are passed to wget.
+rewget accepts all wget options unchanged. Options starting with `--rewget-*` are processed by rewget; all others are passed to wget.
 
-## rwget Options
+## rewget Options
 
 ### Core
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-no-fallback` | Disable fallback, behave exactly like wget |
-| `--rwget-engine=ENGINE` | Select wget engine: `wget` (default), `wget2` |
-| `--rwget-quiet` | Suppress rwget status messages |
-| `--rwget-debug` | Enable verbose debug output |
+| `--rewget-no-fallback` | Disable fallback, behave exactly like wget |
+| `--rewget-engine=ENGINE` | Select wget engine: `wget` (default), `wget2` |
+| `--rewget-quiet` | Suppress rewget status messages |
+| `--rewget-debug` | Enable verbose debug output |
 
 ### Fallback Control
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-fallback-codes=CODES` | HTTP codes that trigger fallback (default: `403,429,503,520-529`) |
-| `--rwget-fallback-stage=N` | Start at stage N: `1`=wget, `2`=impersonate, `3`=js |
-| `--rwget-no-body-detection` | Disable HTML body pattern detection |
+| `--rewget-fallback-codes=CODES` | HTTP codes that trigger fallback (default: `403,429,503,520-529`) |
+| `--rewget-fallback-stage=N` | Start at stage N: `1`=wget, `2`=impersonate, `3`=js |
+| `--rewget-no-body-detection` | Disable HTML body pattern detection |
 
 ### Browser Profiles
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-profile=NAME` | Use specific browser profile |
-| `--rwget-list-profiles` | List available profiles and exit |
-| `--rwget-update-profiles` | Update profiles from remote and exit |
-| `--rwget-profile-url=URL` | Custom profile update URL |
-| `--rwget-no-verify` | Skip Ed25519 signature verification |
-| `--rwget-verify-profile=NAME` | Verify profile fingerprints and exit |
+| `--rewget-profile=NAME` | Use specific browser profile |
+| `--rewget-list-profiles` | List available profiles and exit |
+| `--rewget-update-profiles` | Update profiles from remote and exit |
+| `--rewget-profile-url=URL` | Custom profile update URL |
+| `--rewget-no-verify` | Skip Ed25519 signature verification |
+| `--rewget-verify-profile=NAME` | Verify profile fingerprints and exit |
 
 ### JavaScript Preflight
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-js` | Force JavaScript preflight (Stage 3) |
-| `--rwget-js-wait=COND` | Wait condition: `networkidle`, `selector:CSS`, `delay:MS` |
-| `--rwget-download-chromium` | Pre-download Chromium and exit |
-| `--rwget-chromium-path` | Print Chromium path and exit |
+| `--rewget-js` | Force JavaScript preflight (Stage 3) |
+| `--rewget-js-wait=COND` | Wait condition: `networkidle`, `selector:CSS`, `delay:MS` |
+| `--rewget-download-chromium` | Pre-download Chromium and exit |
+| `--rewget-chromium-path` | Print Chromium path and exit |
 
 ### Timeouts
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-timeout-stage1=MS` | Stage 1 timeout (default: wget settings) |
-| `--rwget-timeout-stage2=MS` | Stage 2 timeout (default: 15000) |
-| `--rwget-timeout-stage3=MS` | Stage 3 timeout (default: 30000) |
+| `--rewget-timeout-stage1=MS` | Stage 1 timeout (default: wget settings) |
+| `--rewget-timeout-stage2=MS` | Stage 2 timeout (default: 15000) |
+| `--rewget-timeout-stage3=MS` | Stage 3 timeout (default: 30000) |
 
 ### Caching
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-no-cache` | Disable domain stage caching |
-| `--rwget-clear-cache` | Clear stage cache and exit |
+| `--rewget-no-cache` | Disable domain stage caching |
+| `--rewget-clear-cache` | Clear stage cache and exit |
 
 ### Daemon
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-daemon=MODE` | Daemon mode: `auto` (default), `on`, `off` |
+| `--rewget-daemon=MODE` | Daemon mode: `auto` (default), `on`, `off` |
 
 ### Information
 
 | Option | Description |
 |--------|-------------|
-| `--rwget-version` | Print version and exit |
-| `--rwget-help` | Print help and exit |
-| `--rwget-completions=SHELL` | Generate completions: `bash`, `zsh`, `fish`, `powershell` |
+| `--rewget-version` | Print version and exit |
+| `--rewget-help` | Print help and exit |
+| `--rewget-completions=SHELL` | Generate completions: `bash`, `zsh`, `fish`, `powershell` |
 
 ## Common wget Options
 
-These are the most commonly used wget options. All wget options work with rwget.
+These are the most commonly used wget options. All wget options work with rewget.
 
 ### Output
 
@@ -145,7 +145,7 @@ For complete wget documentation, run `wget --help` or `man wget`.
 
 ## Exit Codes
 
-rwget uses wget's exit codes:
+rewget uses wget's exit codes:
 
 | Code | Description |
 |------|-------------|
@@ -165,75 +165,75 @@ rwget uses wget's exit codes:
 
 ```bash
 # Simple download
-rwget https://example.com/file.tar.gz
+rewget https://example.com/file.tar.gz
 
 # Save with specific filename
-rwget -O myfile.tar.gz https://example.com/file.tar.gz
+rewget -O myfile.tar.gz https://example.com/file.tar.gz
 
 # Resume interrupted download
-rwget -c https://example.com/large-file.iso
+rewget -c https://example.com/large-file.iso
 ```
 
 ### Fallback Control
 
 ```bash
 # Disable fallback (strict mode)
-rwget --rwget-no-fallback https://example.com/
+rewget --rewget-no-fallback https://example.com/
 
 # Only retry on 403
-rwget --rwget-fallback-codes=403 https://example.com/
+rewget --rewget-fallback-codes=403 https://example.com/
 
 # Start at Stage 2
-rwget --rwget-fallback-stage=2 https://example.com/
+rewget --rewget-fallback-stage=2 https://example.com/
 ```
 
 ### JavaScript Sites
 
 ```bash
 # Force JS preflight
-rwget --rwget-js https://protected.example.com/
+rewget --rewget-js https://protected.example.com/
 
 # Wait for content to load
-rwget --rwget-js --rwget-js-wait=networkidle https://protected.example.com/
+rewget --rewget-js --rewget-js-wait=networkidle https://protected.example.com/
 
 # Wait for specific element
-rwget --rwget-js --rwget-js-wait=selector:#main-content https://example.com/
+rewget --rewget-js --rewget-js-wait=selector:#main-content https://example.com/
 ```
 
 ### Profile Management
 
 ```bash
 # List profiles
-rwget --rwget-list-profiles
+rewget --rewget-list-profiles
 
 # Use specific profile
-rwget --rwget-profile=firefox_136 https://example.com/
+rewget --rewget-profile=firefox_136 https://example.com/
 
 # Update profiles
-rwget --rwget-update-profiles
+rewget --rewget-update-profiles
 
 # Verify profile
-rwget --rwget-verify-profile=chrome_131
+rewget --rewget-verify-profile=chrome_131
 ```
 
 ### Debugging
 
 ```bash
 # Debug output
-rwget --rwget-debug https://example.com/
+rewget --rewget-debug https://example.com/
 
 # Quiet mode
-rwget --rwget-quiet https://example.com/
+rewget --rewget-quiet https://example.com/
 ```
 
 ### Combining Options
 
 ```bash
-rwget \
-  --rwget-profile=chrome_131 \
-  --rwget-timeout-stage2=30000 \
-  --rwget-fallback-codes=403,429,503 \
-  --rwget-quiet \
+rewget \
+  --rewget-profile=chrome_131 \
+  --rewget-timeout-stage2=30000 \
+  --rewget-fallback-codes=403,429,503 \
+  --rewget-quiet \
   -O output.html \
   --limit-rate=1M \
   https://example.com/page

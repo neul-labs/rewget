@@ -1,8 +1,8 @@
-# rwget
+# rewget
 
 **wget-compatible wrapper with automatic fallback**
 
-rwget is a drop-in replacement for wget that automatically retries with browser emulation when websites block standard wget requests.
+rewget is a drop-in replacement for wget that automatically retries with browser emulation when websites block standard wget requests.
 
 <div class="grid cards" markdown>
 
@@ -10,10 +10,10 @@ rwget is a drop-in replacement for wget that automatically retries with browser 
 
     ---
 
-    Use rwget exactly like wget. All wget options work unchanged.
+    Use rewget exactly like wget. All wget options work unchanged.
 
     ```bash
-    rwget https://example.com/file.tar.gz
+    rewget https://example.com/file.tar.gz
     ```
 
 -   :material-shield-check:{ .lg .middle } __Automatic Bypass__
@@ -36,7 +36,7 @@ rwget is a drop-in replacement for wget that automatically retries with browser 
 
     ---
 
-    Fine-tune behavior with `--rwget-*` flags while keeping wget semantics.
+    Fine-tune behavior with `--rewget-*` flags while keeping wget semantics.
 
 </div>
 
@@ -44,15 +44,15 @@ rwget is a drop-in replacement for wget that automatically retries with browser 
 
 ```bash
 # Download with automatic fallback
-rwget https://protected-site.com/file.tar.gz
+rewget https://protected-site.com/file.tar.gz
 
-# If the site blocks wget, rwget automatically:
+# If the site blocks wget, rewget automatically:
 # 1. Detects the 403/429 response
 # 2. Retries with browser-like TLS fingerprint
 # 3. Falls back to full browser if needed
 ```
 
-## Why rwget?
+## Why rewget?
 
 Many websites now block wget and curl with bot detection systems like:
 
@@ -61,7 +61,7 @@ Many websites now block wget and curl with bot detection systems like:
 - **PerimeterX** - Advanced bot detection
 - **DataDome** - Real-time bot protection
 
-rwget handles these automatically by progressively escalating through detection bypass techniques.
+rewget handles these automatically by progressively escalating through detection bypass techniques.
 
 ## Features
 
@@ -71,7 +71,7 @@ rwget handles these automatically by progressively escalating through detection 
 | **6 Browser Profiles** | Chrome, Firefox, Safari, Edge with accurate fingerprints |
 | **Domain Caching** | Remembers successful stage per domain (7-day TTL) |
 | **Auto Chromium** | Downloads browser on first use (~150MB) |
-| **Remote Updates** | Keep profiles current with `--rwget-update-profiles` |
+| **Remote Updates** | Keep profiles current with `--rewget-update-profiles` |
 | **Cross-Platform** | Linux, macOS, Windows |
 
 ## Installation
@@ -79,31 +79,31 @@ rwget handles these automatically by progressively escalating through detection 
 === "Homebrew"
 
     ```bash
-    brew install dipankardas011/tap/rwget
+    brew install dipankardas011/tap/rewget
     ```
 
 === "Install Script"
 
     ```bash
-    curl -fsSL https://rwget.dev/install.sh | sh
+    curl -fsSL https://rewget.dev/install.sh | sh
     ```
 
 === "From Source"
 
     ```bash
-    git clone https://github.com/dipankardas011/rwget
-    cd rwget
+    git clone https://github.com/dipankardas011/rewget
+    cd rewget
     cargo build --release
     ```
 
 [Get Started :material-arrow-right:](installation.md){ .md-button .md-button--primary }
-[View on GitHub :material-github:](https://github.com/dipankardas011/rwget){ .md-button }
+[View on GitHub :material-github:](https://github.com/dipankardas011/rewget){ .md-button }
 
 ## How It Works
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         rwget                                │
+│                         rewget                                │
 ├─────────────────────────────────────────────────────────────┤
 │  Stage 1: wget          "Try plain wget first"              │
 │     ↓ (403/429?)                                            │
@@ -113,8 +113,8 @@ rwget handles these automatically by progressively escalating through detection 
 └─────────────────────────────────────────────────────────────┘
 ```
 
-rwget starts with the fastest option (plain wget) and only escalates when needed. Most downloads complete at Stage 1 with zero overhead.
+rewget starts with the fastest option (plain wget) and only escalates when needed. Most downloads complete at Stage 1 with zero overhead.
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/dipankardas011/rwget/blob/main/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/dipankardas011/rewget/blob/main/LICENSE) for details.

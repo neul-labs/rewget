@@ -1,11 +1,11 @@
-//! Daemon client for communicating with rwgetd
+//! Daemon client for communicating with rewgetd
 //!
-//! Handles IPC to rwgetd for Stage 2/3 requests.
+//! Handles IPC to rewgetd for Stage 2/3 requests.
 
 use anyhow::{Context, Result};
 use nng::options::Options;
 use nng::{Message, Protocol, Socket};
-use rwget_core::{socket_path, Request, Response};
+use rewget_core::{socket_path, Request, Response};
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -145,12 +145,12 @@ fn spawn_daemon() -> Result<()> {
     Ok(())
 }
 
-/// Find the rwgetd binary
+/// Find the rewgetd binary
 fn find_daemon_binary() -> Result<PathBuf> {
-    // First, check if rwgetd is in the same directory as rwget
+    // First, check if rewgetd is in the same directory as rewget
     if let Ok(exe_path) = std::env::current_exe() {
         if let Some(parent) = exe_path.parent() {
-            let daemon_path = parent.join("rwgetd");
+            let daemon_path = parent.join("rewgetd");
             if daemon_path.exists() {
                 return Ok(daemon_path);
             }
@@ -158,11 +158,11 @@ fn find_daemon_binary() -> Result<PathBuf> {
     }
 
     // Check PATH
-    if let Ok(path) = which::which("rwgetd") {
+    if let Ok(path) = which::which("rewgetd") {
         return Ok(path);
     }
 
-    anyhow::bail!("rwgetd not found. Install it or add it to your PATH.")
+    anyhow::bail!("rewgetd not found. Install it or add it to your PATH.")
 }
 
 #[cfg(test)]
@@ -173,6 +173,6 @@ mod tests {
     fn test_socket_path_exists() {
         // Just check we can get a path
         let path = socket_path();
-        assert!(path.to_string_lossy().contains("rwgetd"));
+        assert!(path.to_string_lossy().contains("rewgetd"));
     }
 }

@@ -1,18 +1,18 @@
 [workspace]
 resolver = "2"
 members = [
-    "crates/rwget",
-    "crates/rwgetd",
-    "crates/rwget-core",
+    "crates/rewget",
+    "crates/rewgetd",
+    "crates/rewget-core",
 ]
 
 [workspace.package]
 version = "1.0.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/neul-labs/rwget"
-documentation = "https://docs.neullabs.com/rwget"
-homepage = "https://github.com/neul-labs/rwget"
+repository = "https://github.com/neul-labs/rewget"
+documentation = "https://docs.neullabs.com/rewget"
+homepage = "https://github.com/neul-labs/rewget"
 authors = ["neul-labs"]
 
 # Release optimizations
@@ -74,4 +74,4 @@ sha2 = "0.10"
 mimalloc = "0.1"
 
 # Internal crates
-rwget-core = { path = "crates/rwget-core" }
+rewget-core = { path = "crates/rewget-core" }

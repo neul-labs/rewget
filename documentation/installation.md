@@ -1,25 +1,25 @@
 # Installation
 
-rwget supports Linux, macOS, and Windows. Choose your preferred installation method below.
+rewget supports Linux, macOS, and Windows. Choose your preferred installation method below.
 
 ## Package Managers
 
 ### Homebrew (macOS / Linux)
 
-The easiest way to install rwget on macOS or Linux:
+The easiest way to install rewget on macOS or Linux:
 
 ```bash
-brew install dipankardas011/tap/rwget
+brew install dipankardas011/tap/rewget
 ```
 
-This installs both `rwget` and `rwgetd` binaries, along with shell completions and man pages.
+This installs both `rewget` and `rewgetd` binaries, along with shell completions and man pages.
 
 ### Cargo (All Platforms)
 
 If you have Rust installed:
 
 ```bash
-cargo install rwget
+cargo install rewget
 ```
 
 ## Install Script
@@ -27,43 +27,43 @@ cargo install rwget
 ### Linux / macOS
 
 ```bash
-curl -fsSL https://rwget.dev/install.sh | sh
+curl -fsSL https://rewget.dev/install.sh | sh
 ```
 
 Or with custom install directory:
 
 ```bash
-RWGET_INSTALL_DIR=/usr/local/bin curl -fsSL https://rwget.dev/install.sh | sh
+RWGET_INSTALL_DIR=/usr/local/bin curl -fsSL https://rewget.dev/install.sh | sh
 ```
 
 ### Windows (PowerShell)
 
 ```powershell
-irm https://rwget.dev/install.ps1 | iex
+irm https://rewget.dev/install.ps1 | iex
 ```
 
 ## Manual Installation
 
 ### Download Pre-built Binaries
 
-Download the appropriate archive for your platform from the [releases page](https://github.com/dipankardas011/rwget/releases):
+Download the appropriate archive for your platform from the [releases page](https://github.com/dipankardas011/rewget/releases):
 
 | Platform | Architecture | Download |
 |----------|--------------|----------|
-| Linux | x86_64 | `rwget-x86_64-unknown-linux-gnu.tar.gz` |
-| Linux | ARM64 | `rwget-aarch64-unknown-linux-gnu.tar.gz` |
-| macOS | x86_64 (Intel) | `rwget-x86_64-apple-darwin.tar.gz` |
-| macOS | ARM64 (Apple Silicon) | `rwget-aarch64-apple-darwin.tar.gz` |
-| Windows | x86_64 | `rwget-x86_64-pc-windows-gnu.zip` |
+| Linux | x86_64 | `rewget-x86_64-unknown-linux-gnu.tar.gz` |
+| Linux | ARM64 | `rewget-aarch64-unknown-linux-gnu.tar.gz` |
+| macOS | x86_64 (Intel) | `rewget-x86_64-apple-darwin.tar.gz` |
+| macOS | ARM64 (Apple Silicon) | `rewget-aarch64-apple-darwin.tar.gz` |
+| Windows | x86_64 | `rewget-x86_64-pc-windows-gnu.zip` |
 
 Extract and install:
 
 === "Linux / macOS"
 
     ```bash
-    tar -xzf rwget-*.tar.gz
-    sudo install -m 755 rwget /usr/local/bin/
-    sudo install -m 755 rwgetd /usr/local/bin/
+    tar -xzf rewget-*.tar.gz
+    sudo install -m 755 rewget /usr/local/bin/
+    sudo install -m 755 rewgetd /usr/local/bin/
     ```
 
 === "Windows"
@@ -80,14 +80,14 @@ Requirements:
 
 ```bash
 # Clone the repository
-git clone https://github.com/dipankardas011/rwget
-cd rwget
+git clone https://github.com/dipankardas011/rewget
+cd rewget
 
 # Build release binaries
 cargo build --release
 
 # Install to ~/.cargo/bin (or copy manually)
-cargo install --path crates/rwget
+cargo install --path crates/rewget
 ```
 
 ## Post-Installation Setup
@@ -95,22 +95,22 @@ cargo install --path crates/rwget
 ### Verify Installation
 
 ```bash
-rwget --rwget-version
-# rwget 1.0.0
+rewget --rewget-version
+# rewget 1.0.0
 
-rwget --rwget-help
+rewget --rewget-help
 ```
 
 ### Shell Completions
 
-Enable tab completion for rwget commands:
+Enable tab completion for rewget commands:
 
 === "Bash"
 
     Add to `~/.bashrc`:
 
     ```bash
-    eval "$(rwget --rwget-completions=bash)"
+    eval "$(rewget --rewget-completions=bash)"
     ```
 
 === "Zsh"
@@ -118,7 +118,7 @@ Enable tab completion for rwget commands:
     Add to `~/.zshrc`:
 
     ```bash
-    eval "$(rwget --rwget-completions=zsh)"
+    eval "$(rewget --rewget-completions=zsh)"
     ```
 
 === "Fish"
@@ -126,7 +126,7 @@ Enable tab completion for rwget commands:
     Add to `~/.config/fish/config.fish`:
 
     ```fish
-    rwget --rwget-completions=fish | source
+    rewget --rewget-completions=fish | source
     ```
 
 === "PowerShell"
@@ -134,29 +134,29 @@ Enable tab completion for rwget commands:
     Add to your PowerShell profile:
 
     ```powershell
-    rwget --rwget-completions=powershell | Out-String | Invoke-Expression
+    rewget --rewget-completions=powershell | Out-String | Invoke-Expression
     ```
 
 ### Replace wget (Optional)
 
-To use rwget as your default wget, add an alias:
+To use rewget as your default wget, add an alias:
 
 === "Bash / Zsh"
 
     ```bash
-    alias wget='rwget'
+    alias wget='rewget'
     ```
 
 === "Fish"
 
     ```fish
-    alias wget='rwget'
+    alias wget='rewget'
     ```
 
 === "PowerShell"
 
     ```powershell
-    Set-Alias -Name wget -Value rwget
+    Set-Alias -Name wget -Value rewget
     ```
 
 ### Pre-download Chromium (Optional)
@@ -164,14 +164,14 @@ To use rwget as your default wget, add an alias:
 Stage 3 (JavaScript preflight) requires Chromium. It downloads automatically on first use, but you can pre-download it:
 
 ```bash
-rwget --rwget-download-chromium
+rewget --rewget-download-chromium
 ```
 
-This downloads Chrome for Testing (~150MB) to `~/.local/share/rwget/chromium/`.
+This downloads Chrome for Testing (~150MB) to `~/.local/share/rewget/chromium/`.
 
 ## Dependencies
 
-rwget requires `wget` or `wget2` to be installed on your system:
+rewget requires `wget` or `wget2` to be installed on your system:
 
 === "Debian / Ubuntu"
 
@@ -200,19 +200,19 @@ rwget requires `wget` or `wget2` to be installed on your system:
 === "Homebrew"
 
     ```bash
-    brew uninstall rwget
+    brew uninstall rewget
     ```
 
 === "Manual"
 
     ```bash
-    rm /usr/local/bin/rwget /usr/local/bin/rwgetd
-    rm -rf ~/.local/share/rwget  # Remove Chromium and profiles
-    rm -rf ~/.cache/rwget        # Remove cache
+    rm /usr/local/bin/rewget /usr/local/bin/rewgetd
+    rm -rf ~/.local/share/rewget  # Remove Chromium and profiles
+    rm -rf ~/.cache/rewget        # Remove cache
     ```
 
 ## Next Steps
 
-- [Quick Start](quickstart.md) - Get started with rwget
+- [Quick Start](quickstart.md) - Get started with rewget
 - [Usage Guide](usage.md) - Learn about all features
-- [Configuration](configuration.md) - Customize rwget behavior
+- [Configuration](configuration.md) - Customize rewget behavior

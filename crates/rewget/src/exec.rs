@@ -1,11 +1,11 @@
-//! Execution logic for rwget
+//! Execution logic for rewget
 //!
 //! Handles running wget in different modes:
-//! - Strict mode (--rwget-no-fallback): exec() directly to wget (Unix) or spawn+wait (Windows)
+//! - Strict mode (--rewget-no-fallback): exec() directly to wget (Unix) or spawn+wait (Windows)
 //! - Default mode: spawn wget, capture output, fallback on failure
 
 use anyhow::{Context, Result};
-use rwget_core::{analyze_exit_code, extract_domain, is_fallback_code, Config, DetectionResult, DomainCache};
+use rewget_core::{analyze_exit_code, extract_domain, is_fallback_code, Config, DetectionResult, DomainCache};
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
@@ -30,7 +30,7 @@ pub fn run(config: Config, wget_args: Vec<String>) -> Result<()> {
 
 /// Execute wget directly, replacing the current process
 ///
-/// This is used in strict mode (--rwget-no-fallback) for zero overhead.
+/// This is used in strict mode (--rewget-no-fallback) for zero overhead.
 /// On Unix, uses exec() to replace the current process.
 /// On Windows, spawns the process and waits for it.
 #[cfg(unix)]
@@ -87,14 +87,14 @@ fn run_with_fallback(
     let start_stage = cached_stage.unwrap_or(1);
 
     if config.debug {
-        eprintln!("[rwget] Engine: {} ({})", config.engine, engine_path.display());
-        eprintln!("[rwget] Args: {:?}", wget_args);
-        eprintln!("[rwget] Fallback: enabled (max Stage {})", config.fallback_stage);
+        eprintln!("[rewget] Engine: {} ({})", config.engine, engine_path.display());
+        eprintln!("[rewget] Args: {:?}", wget_args);
+        eprintln!("[rewget] Fallback: enabled (max Stage {})", config.fallback_stage);
         if let Some(d) = &domain {
-            eprintln!("[rwget] Domain: {}", d);
+            eprintln!("[rewget] Domain: {}", d);
         }
         if let Some(s) = cached_stage {
-            eprintln!("[rwget] Cached stage: {} (skipping lower stages)", s);
+            eprintln!("[rewget] Cached stage: {} (skipping lower stages)", s);
         }
     }
 
@@ -110,11 +110,11 @@ fn run_with_fallback(
         let detection = analyze_exit_code(exit_code, &stderr_output);
 
         if config.debug {
-            eprintln!("[rwget] Exit code: {}", exit_code);
+            eprintln!("[rewget] Exit code: {}", exit_code);
             if let Some(status) = detection.status_code {
-                eprintln!("[rwget] HTTP status: {}", status);
+                eprintln!("[rewget] HTTP status: {}", status);
             }
-            eprintln!("[rwget] Blocked: {}", detection.blocked);
+            eprintln!("[rewget] Blocked: {}", detection.blocked);
         }
 
         // Check if we should fall back
@@ -150,11 +150,11 @@ fn run_with_fallback(
                             match run_stage3(&config, &url, output, &domain, &mut cache) {
                                 Ok(true) => return Ok(()), // Stage 3 succeeded
                                 Ok(false) => {
-                                    eprintln!("[rwget] All stages exhausted, request still blocked");
+                                    eprintln!("[rewget] All stages exhausted, request still blocked");
                                     std::process::exit(exit_code);
                                 }
                                 Err(e) => {
-                                    eprintln!("[rwget] Stage 3 failed: {}", e);
+                                    eprintln!("[rewget] Stage 3 failed: {}", e);
                                     std::process::exit(exit_code);
                                 }
                             }
@@ -162,12 +162,12 @@ fn run_with_fallback(
                         std::process::exit(exit_code);
                     }
                     Err(e) => {
-                        eprintln!("[rwget] Stage 2 failed: {}", e);
+                        eprintln!("[rewget] Stage 2 failed: {}", e);
                         std::process::exit(exit_code);
                     }
                 }
             } else {
-                eprintln!("[rwget] No URL found in arguments");
+                eprintln!("[rewget] No URL found in arguments");
                 std::process::exit(exit_code);
             }
         }
@@ -237,7 +237,7 @@ fn run_stage2(
     daemon::ensure_running()?;
 
     if config.debug {
-        eprintln!("[rwget] Stage 2: Requesting via daemon with browser impersonation");
+        eprintln!("[rewget] Stage 2: Requesting via daemon with browser impersonation");
     }
 
     // Make the request
@@ -249,7 +249,7 @@ fn run_stage2(
     )?;
 
     if config.debug {
-        eprintln!("[rwget] Stage 2 response: success={}, status={:?}, blocked={}",
+        eprintln!("[rewget] Stage 2 response: success={}, status={:?}, blocked={}",
             response.success, response.status_code, response.blocked);
     }
 
@@ -265,7 +265,7 @@ fn run_stage2(
         // Print success info
         if let Some(status) = response.status_code {
             if !config.quiet {
-                eprintln!("[rwget] Stage 2 succeeded: HTTP {}", status);
+                eprintln!("[rewget] Stage 2 succeeded: HTTP {}", status);
             }
         }
 
@@ -276,14 +276,14 @@ fn run_stage2(
             }
         } else if let Some(bytes) = response.bytes_written {
             if !config.quiet {
-                eprintln!("[rwget] Saved {} bytes", bytes);
+                eprintln!("[rewget] Saved {} bytes", bytes);
             }
         }
 
         Ok(true)
     } else if response.blocked {
         if !config.quiet {
-            eprintln!("[rwget] Stage 2 blocked: {:?}", response.block_reason);
+            eprintln!("[rewget] Stage 2 blocked: {:?}", response.block_reason);
         }
         Ok(false)
     } else {
@@ -309,7 +309,7 @@ fn run_stage3(
     daemon::ensure_running()?;
 
     if config.debug {
-        eprintln!("[rwget] Stage 3: Requesting via daemon with JS preflight (headless Chromium)");
+        eprintln!("[rewget] Stage 3: Requesting via daemon with JS preflight (headless Chromium)");
     }
 
     // Make the request
@@ -321,7 +321,7 @@ fn run_stage3(
     )?;
 
     if config.debug {
-        eprintln!("[rwget] Stage 3 response: success={}, status={:?}, blocked={}",
+        eprintln!("[rewget] Stage 3 response: success={}, status={:?}, blocked={}",
             response.success, response.status_code, response.blocked);
     }
 
@@ -336,7 +336,7 @@ fn run_stage3(
 
         // Print success info
         if !config.quiet {
-            eprintln!("[rwget] Stage 3 succeeded (JS challenge bypassed)");
+            eprintln!("[rewget] Stage 3 succeeded (JS challenge bypassed)");
         }
 
         // If no output file, write body to stdout
@@ -346,14 +346,14 @@ fn run_stage3(
             }
         } else if let Some(bytes) = response.bytes_written {
             if !config.quiet {
-                eprintln!("[rwget] Saved {} bytes", bytes);
+                eprintln!("[rewget] Saved {} bytes", bytes);
             }
         }
 
         Ok(true)
     } else if response.blocked {
         if !config.quiet {
-            eprintln!("[rwget] Stage 3 blocked: {:?}", response.block_reason);
+            eprintln!("[rewget] Stage 3 blocked: {:?}", response.block_reason);
         }
         Ok(false)
     } else {
@@ -393,7 +393,7 @@ fn print_fallback_message(detection: &DetectionResult, target_stage: u8) {
     };
 
     eprintln!(
-        "[rwget] {} detected, falling back to Stage {}",
+        "[rewget] {} detected, falling back to Stage {}",
         reason, target_stage
     );
 }
@@ -448,7 +448,7 @@ fn run_wget_stage1(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rwget_core::Config;
+    use rewget_core::Config;
 
     #[test]
     fn test_should_trigger_fallback_blocked() {
@@ -456,7 +456,7 @@ mod tests {
         let detection = DetectionResult {
             blocked: true,
             status_code: Some(403),
-            reason: Some(rwget_core::BlockReason::StatusCode(403)),
+            reason: Some(rewget_core::BlockReason::StatusCode(403)),
             exit_code: 8,
         };
         assert!(should_trigger_fallback(&config, &detection));

@@ -1,14 +1,14 @@
 # Usage Guide
 
-This guide covers all rwget features in detail.
+This guide covers all rewget features in detail.
 
 ## Understanding the Fallback Stages
 
-rwget uses a three-stage fallback system:
+rewget uses a three-stage fallback system:
 
 ### Stage 1: Plain wget
 
-The fastest option. rwget runs wget directly with your arguments.
+The fastest option. rewget runs wget directly with your arguments.
 
 - **Overhead**: Zero
 - **Success rate**: Works for most unprotected sites
@@ -37,7 +37,7 @@ Full headless browser session for JavaScript challenges.
 For scripts that need predictable behavior:
 
 ```bash
-rwget --rwget-no-fallback https://example.com/
+rewget --rewget-no-fallback https://example.com/
 ```
 
 The command exits with wget's original exit code if blocked.
@@ -48,32 +48,32 @@ Skip earlier stages:
 
 ```bash
 # Start at Stage 2 (impersonation)
-rwget --rwget-fallback-stage=2 https://example.com/
+rewget --rewget-fallback-stage=2 https://example.com/
 
 # Start at Stage 3 (JS preflight)
-rwget --rwget-fallback-stage=3 https://example.com/
+rewget --rewget-fallback-stage=3 https://example.com/
 # Or use the shorthand:
-rwget --rwget-js https://example.com/
+rewget --rewget-js https://example.com/
 ```
 
 ### Custom Fallback Codes
 
-By default, rwget retries on 403, 429, 503, and 520-529. Customize this:
+By default, rewget retries on 403, 429, 503, and 520-529. Customize this:
 
 ```bash
 # Only retry on 403
-rwget --rwget-fallback-codes=403 https://example.com/
+rewget --rewget-fallback-codes=403 https://example.com/
 
 # Retry on specific codes
-rwget --rwget-fallback-codes=403,429,503 https://example.com/
+rewget --rewget-fallback-codes=403,429,503 https://example.com/
 ```
 
 ### Disable Body Detection
 
-rwget also checks response bodies for bot detection signatures. Disable this:
+rewget also checks response bodies for bot detection signatures. Disable this:
 
 ```bash
-rwget --rwget-no-body-detection https://example.com/
+rewget --rewget-no-body-detection https://example.com/
 ```
 
 ## Browser Profiles
@@ -81,15 +81,15 @@ rwget --rwget-no-body-detection https://example.com/
 ### List Available Profiles
 
 ```bash
-rwget --rwget-list-profiles
+rewget --rewget-list-profiles
 ```
 
 ### Use a Specific Profile
 
 ```bash
-rwget --rwget-profile=chrome_131 https://example.com/
-rwget --rwget-profile=firefox_136 https://example.com/
-rwget --rwget-profile=safari_18 https://example.com/
+rewget --rewget-profile=chrome_131 https://example.com/
+rewget --rewget-profile=firefox_136 https://example.com/
+rewget --rewget-profile=safari_18 https://example.com/
 ```
 
 ### Update Profiles
@@ -97,19 +97,19 @@ rwget --rwget-profile=safari_18 https://example.com/
 Keep profiles current with the latest browser fingerprints:
 
 ```bash
-rwget --rwget-update-profiles
+rewget --rewget-update-profiles
 ```
 
 Use a custom profile URL:
 
 ```bash
-rwget --rwget-profile-url=https://my-server.com/profiles.json --rwget-update-profiles
+rewget --rewget-profile-url=https://my-server.com/profiles.json --rewget-update-profiles
 ```
 
 Skip signature verification (not recommended):
 
 ```bash
-rwget --rwget-no-verify --rwget-update-profiles
+rewget --rewget-no-verify --rewget-update-profiles
 ```
 
 ### Verify a Profile
@@ -117,7 +117,7 @@ rwget --rwget-no-verify --rwget-update-profiles
 Check a profile's fingerprint details:
 
 ```bash
-rwget --rwget-verify-profile=chrome_131
+rewget --rewget-verify-profile=chrome_131
 ```
 
 ## JavaScript Preflight Options
@@ -128,13 +128,13 @@ Control when Stage 3 considers the page ready:
 
 ```bash
 # Wait for network to be idle
-rwget --rwget-js --rwget-js-wait=networkidle https://example.com/
+rewget --rewget-js --rewget-js-wait=networkidle https://example.com/
 
 # Wait for specific element
-rwget --rwget-js --rwget-js-wait=selector:#content https://example.com/
+rewget --rewget-js --rewget-js-wait=selector:#content https://example.com/
 
 # Wait fixed time (milliseconds)
-rwget --rwget-js --rwget-js-wait=delay:5000 https://example.com/
+rewget --rewget-js --rewget-js-wait=delay:5000 https://example.com/
 ```
 
 ### Chromium Management
@@ -142,49 +142,49 @@ rwget --rwget-js --rwget-js-wait=delay:5000 https://example.com/
 Pre-download Chromium:
 
 ```bash
-rwget --rwget-download-chromium
+rewget --rewget-download-chromium
 ```
 
 Check Chromium installation:
 
 ```bash
-rwget --rwget-chromium-path
+rewget --rewget-chromium-path
 ```
 
 ## Domain Stage Caching
 
-When a stage succeeds for a domain, rwget caches it to skip failed stages on future requests.
+When a stage succeeds for a domain, rewget caches it to skip failed stages on future requests.
 
 ### How It Works
 
 ```bash
 # First request - tries Stage 1, fails, Stage 2 succeeds
-$ rwget https://protected.example.com/file1.txt
-[rwget] 403 Forbidden - retrying with impersonation...
-[rwget] Success at Stage 2 (chrome_131)
-[rwget] Cached: protected.example.com → Stage 2
+$ rewget https://protected.example.com/file1.txt
+[rewget] 403 Forbidden - retrying with impersonation...
+[rewget] Success at Stage 2 (chrome_131)
+[rewget] Cached: protected.example.com → Stage 2
 
 # Second request - starts at Stage 2
-$ rwget https://protected.example.com/file2.txt
-[rwget] Using cached Stage 2 for protected.example.com
+$ rewget https://protected.example.com/file2.txt
+[rewget] Using cached Stage 2 for protected.example.com
 ```
 
 ### Cache Location
 
 ```
-~/.cache/rwget/stage-cache.json
+~/.cache/rewget/stage-cache.json
 ```
 
 ### Clear Cache
 
 ```bash
-rwget --rwget-clear-cache
+rewget --rewget-clear-cache
 ```
 
 ### Disable Cache
 
 ```bash
-rwget --rwget-no-cache https://example.com/
+rewget --rewget-no-cache https://example.com/
 ```
 
 ## Timeouts
@@ -193,30 +193,30 @@ Control how long each stage waits:
 
 ```bash
 # Stage 1 timeout (uses wget's settings by default)
-rwget --rwget-timeout-stage1=30000 https://example.com/
+rewget --rewget-timeout-stage1=30000 https://example.com/
 
 # Stage 2 timeout (default: 15 seconds)
-rwget --rwget-timeout-stage2=30000 https://example.com/
+rewget --rewget-timeout-stage2=30000 https://example.com/
 
 # Stage 3 timeout (default: 30 seconds)
-rwget --rwget-timeout-stage3=60000 https://example.com/
+rewget --rewget-timeout-stage3=60000 https://example.com/
 ```
 
 ## Daemon Control
 
-rwget uses a daemon (`rwgetd`) for Stage 2/3 operations.
+rewget uses a daemon (`rewgetd`) for Stage 2/3 operations.
 
 ### Daemon Modes
 
 ```bash
 # Auto mode (default) - starts daemon when needed
-rwget --rwget-daemon=auto https://example.com/
+rewget --rewget-daemon=auto https://example.com/
 
 # Always use daemon
-rwget --rwget-daemon=on https://example.com/
+rewget --rewget-daemon=on https://example.com/
 
 # Never use daemon (Stage 1 only)
-rwget --rwget-daemon=off https://example.com/
+rewget --rewget-daemon=off https://example.com/
 ```
 
 ## Engine Selection
@@ -225,23 +225,23 @@ Choose between wget and wget2:
 
 ```bash
 # Use wget (default)
-rwget --rwget-engine=wget https://example.com/
+rewget --rewget-engine=wget https://example.com/
 
 # Use wget2
-rwget --rwget-engine=wget2 https://example.com/
+rewget --rewget-engine=wget2 https://example.com/
 
 # Set via environment variable
-RWGET_ENGINE=wget2 rwget https://example.com/
+RWGET_ENGINE=wget2 rewget https://example.com/
 ```
 
 ## Output Control
 
 ### Quiet Mode
 
-Suppress rwget status messages:
+Suppress rewget status messages:
 
 ```bash
-rwget --rwget-quiet https://example.com/
+rewget --rewget-quiet https://example.com/
 ```
 
 ### Debug Mode
@@ -249,7 +249,7 @@ rwget --rwget-quiet https://example.com/
 Enable verbose debug output:
 
 ```bash
-rwget --rwget-debug https://example.com/
+rewget --rewget-debug https://example.com/
 ```
 
 ## Combining Options
@@ -257,18 +257,18 @@ rwget --rwget-debug https://example.com/
 Options can be combined:
 
 ```bash
-rwget \
-  --rwget-profile=chrome_131 \
-  --rwget-fallback-codes=403,429 \
-  --rwget-timeout-stage2=30000 \
-  --rwget-quiet \
+rewget \
+  --rewget-profile=chrome_131 \
+  --rewget-fallback-codes=403,429 \
+  --rewget-timeout-stage2=30000 \
+  --rewget-quiet \
   -O output.html \
   https://protected-site.com/page
 ```
 
 ## Exit Codes
 
-rwget uses wget's exit codes:
+rewget uses wget's exit codes:
 
 | Code | Meaning |
 |------|---------|
@@ -282,4 +282,4 @@ rwget uses wget's exit codes:
 | 7 | Protocol error |
 | 8 | Server error (includes 403, 404, etc.) |
 
-When fallback succeeds, rwget exits with 0 regardless of which stage worked.
+When fallback succeeds, rewget exits with 0 regardless of which stage worked.
