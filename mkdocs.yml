@@ -4,8 +4,8 @@ site_description: wget-compatible wrapper with automatic fallback for blocked re
 site_author: Dipankar Das
 site_url: https://rewget.dev
 
-repo_name: dipankardas011/rewget
-repo_url: https://github.com/dipankardas011/rewget
+repo_name: neul-labs/rewget
+repo_url: https://github.com/neul-labs/rewget
 
 theme:
   name: material
@@ -77,7 +77,7 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/dipankardas011/rewget
+      link: https://github.com/neul-labs/rewget
   version:
     provider: mike
 

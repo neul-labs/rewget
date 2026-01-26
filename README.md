@@ -16,7 +16,7 @@ A drop-in wget replacement that automatically bypasses bot protection. When site
 
 ```bash
 # Install via Homebrew (macOS / Linux)
-brew install dipankardas011/tap/rewget
+brew install neul-labs/tap/rewget
 
 # Or use the install script
 curl -fsSL https://rewget.dev/install.sh | sh
@@ -96,7 +96,7 @@ Results are cached per-domain (7-day TTL), so subsequent requests skip straight 
 
 ```bash
 # Homebrew (macOS / Linux)
-brew install dipankardas011/tap/rewget
+brew install neul-labs/tap/rewget
 
 # Cargo (from source)
 cargo install rewget

@@ -3,28 +3,28 @@
 
 class Rewget < Formula
   desc "wget-compatible wrapper with automatic fallback"
-  homepage "https://github.com/dipankardas011/rewget"
+  homepage "https://github.com/neul-labs/rewget"
   version "1.0.0"
   license "MIT"
 
   on_macos do
     on_arm do
-      url "https://github.com/dipankardas011/rewget/releases/download/v1.0.0/rewget-aarch64-apple-darwin.tar.gz"
+      url "https://github.com/neul-labs/rewget/releases/download/v1.0.0/rewget-aarch64-apple-darwin.tar.gz"
       sha256 "PLACEHOLDER_SHA256_MACOS_ARM64"
     end
     on_intel do
-      url "https://github.com/dipankardas011/rewget/releases/download/v1.0.0/rewget-x86_64-apple-darwin.tar.gz"
+      url "https://github.com/neul-labs/rewget/releases/download/v1.0.0/rewget-x86_64-apple-darwin.tar.gz"
       sha256 "PLACEHOLDER_SHA256_MACOS_X64"
     end
   end
 
   on_linux do
     on_arm do
-      url "https://github.com/dipankardas011/rewget/releases/download/v1.0.0/rewget-aarch64-unknown-linux-gnu.tar.gz"
+      url "https://github.com/neul-labs/rewget/releases/download/v1.0.0/rewget-aarch64-unknown-linux-gnu.tar.gz"
       sha256 "PLACEHOLDER_SHA256_LINUX_ARM64"
     end
     on_intel do
-      url "https://github.com/dipankardas011/rewget/releases/download/v1.0.0/rewget-x86_64-unknown-linux-gnu.tar.gz"
+      url "https://github.com/neul-labs/rewget/releases/download/v1.0.0/rewget-x86_64-unknown-linux-gnu.tar.gz"
       sha256 "PLACEHOLDER_SHA256_LINUX_X64"
     end
   end

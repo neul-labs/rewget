@@ -13,7 +13,7 @@ Thank you for your interest in contributing to rewget!
 ### Clone and Build
 
 ```bash
-git clone https://github.com/dipankardas011/rewget
+git clone https://github.com/neul-labs/rewget
 cd rewget
 cargo build
 ```
@@ -47,7 +47,7 @@ rewget/
 
 ### Reporting Bugs
 
-1. Check [existing issues](https://github.com/dipankardas011/rewget/issues) first
+1. Check [existing issues](https://github.com/neul-labs/rewget/issues) first
 2. Create a new issue with:
    - rewget version (`rewget --rewget-version`)
    - Operating system and version
@@ -57,7 +57,7 @@ rewget/
 
 ### Suggesting Features
 
-1. Open a [new issue](https://github.com/dipankardas011/rewget/issues/new)
+1. Open a [new issue](https://github.com/neul-labs/rewget/issues/new)
 2. Describe the feature and use case
 3. Explain why it would be useful
 
@@ -224,8 +224,8 @@ By contributing, you agree that your contributions will be licensed under the MI
 
 ## Getting Help
 
-- **Questions**: Open a [discussion](https://github.com/dipankardas011/rewget/discussions)
-- **Bugs**: Open an [issue](https://github.com/dipankardas011/rewget/issues)
+- **Questions**: Open a [discussion](https://github.com/neul-labs/rewget/discussions)
+- **Bugs**: Open an [issue](https://github.com/neul-labs/rewget/issues)
 - **Security**: Email security@rewget.dev
 
 Thank you for contributing to rewget!

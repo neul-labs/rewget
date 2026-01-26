@@ -79,7 +79,7 @@ rewget handles these automatically by progressively escalating through detection
 === "Homebrew"
 
     ```bash
-    brew install dipankardas011/tap/rewget
+    brew install neul-labs/tap/rewget
     ```
 
 === "Install Script"
@@ -91,13 +91,13 @@ rewget handles these automatically by progressively escalating through detection
 === "From Source"
 
     ```bash
-    git clone https://github.com/dipankardas011/rewget
+    git clone https://github.com/neul-labs/rewget
     cd rewget
     cargo build --release
     ```
 
 [Get Started :material-arrow-right:](installation.md){ .md-button .md-button--primary }
-[View on GitHub :material-github:](https://github.com/dipankardas011/rewget){ .md-button }
+[View on GitHub :material-github:](https://github.com/neul-labs/rewget){ .md-button }
 
 ## How It Works
 
@@ -117,4 +117,4 @@ rewget starts with the fastest option (plain wget) and only escalates when neede
 
 ## License
 
-MIT License - see [LICENSE](https://github.com/dipankardas011/rewget/blob/main/LICENSE) for details.
+MIT License - see [LICENSE](https://github.com/neul-labs/rewget/blob/main/LICENSE) for details.

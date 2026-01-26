@@ -6,7 +6,7 @@ set -e
 
 VERSION="${RWGET_VERSION:-1.0.0}"
 INSTALL_DIR="${RWGET_INSTALL_DIR:-$HOME/.local/bin}"
-GITHUB_REPO="dipankardas011/rewget"
+GITHUB_REPO="neul-labs/rewget"
 
 # Detect OS and architecture
 detect_platform() {

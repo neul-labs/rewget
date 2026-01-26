@@ -9,7 +9,7 @@ rewget supports Linux, macOS, and Windows. Choose your preferred installation me
 The easiest way to install rewget on macOS or Linux:
 
 ```bash
-brew install dipankardas011/tap/rewget
+brew install neul-labs/tap/rewget
 ```
 
 This installs both `rewget` and `rewgetd` binaries, along with shell completions and man pages.
@@ -46,7 +46,7 @@ irm https://rewget.dev/install.ps1 | iex
 
 ### Download Pre-built Binaries
 
-Download the appropriate archive for your platform from the [releases page](https://github.com/dipankardas011/rewget/releases):
+Download the appropriate archive for your platform from the [releases page](https://github.com/neul-labs/rewget/releases):
 
 | Platform | Architecture | Download |
 |----------|--------------|----------|
@@ -80,7 +80,7 @@ Requirements:
 
 ```bash
 # Clone the repository
-git clone https://github.com/dipankardas011/rewget
+git clone https://github.com/neul-labs/rewget
 cd rewget
 
 # Build release binaries

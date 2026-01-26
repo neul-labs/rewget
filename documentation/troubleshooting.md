@@ -346,7 +346,7 @@ This shows:
 
 If you can't resolve an issue:
 
-1. Check existing [GitHub Issues](https://github.com/dipankardas011/rewget/issues)
+1. Check existing [GitHub Issues](https://github.com/neul-labs/rewget/issues)
 
 2. Create a new issue with:
    - rewget version (`rewget --rewget-version`)
