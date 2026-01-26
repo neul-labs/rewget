@@ -74,4 +74,4 @@ sha2 = "0.10"
 mimalloc = "0.1"
 
 # Internal crates
-rewget-core = { path = "crates/rewget-core" }
+rewget-core = { version = "1.0.0", path = "crates/rewget-core" }
