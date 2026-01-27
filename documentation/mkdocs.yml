@@ -1,8 +1,8 @@
 site_name: rewget
-docs_dir: documentation
+docs_dir: docs
 site_description: wget-compatible wrapper with automatic fallback for blocked requests
-site_author: Dipankar Das
-site_url: https://rewget.dev
+site_author: Neul Labs
+site_url: https://docs.neullabs.com/rewget
 
 repo_name: neul-labs/rewget
 repo_url: https://github.com/neul-labs/rewget
@@ -81,4 +81,4 @@ extra:
   version:
     provider: mike
 
-copyright: Copyright &copy; 2026 Dipankar Das
+copyright: Copyright &copy; 2026 Neul Labs
