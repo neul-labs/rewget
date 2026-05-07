@@ -3,7 +3,7 @@
 //! Separates --rewget-* flags from wget arguments while preserving order.
 
 use anyhow::{anyhow, Result};
-use rewget_core::{Config, DaemonMode, Engine};
+use rewget_core::{Config, DaemonMode, Engine, FetchStage};
 
 /// Parsed command-line arguments
 #[derive(Debug)]
@@ -79,7 +79,7 @@ impl Args {
                         "debug" => config.debug = true,
                         "no-body-detection" => config.body_detection = false,
                         "no-cache" => config.no_cache = true,
-                        "js" => config.fallback_stage = 3,
+                        "js" => config.fallback_stage = FetchStage::Preflight,
                         "version" => command = Command::Version,
                         "help" => command = Command::Help,
                         "clear-cache" => command = Command::ClearCache,
@@ -105,10 +105,9 @@ impl Args {
 
                         "fallback-stage" => {
                             let v = value.ok_or_else(|| anyhow!("--rewget-fallback-stage requires a value"))?;
-                            config.fallback_stage = v.parse().map_err(|_| anyhow!("Invalid stage: {}", v))?;
-                            if config.fallback_stage < 1 || config.fallback_stage > 3 {
-                                return Err(anyhow!("Stage must be 1, 2, or 3"));
-                            }
+                            let stage_num: u8 = v.parse().map_err(|_| anyhow!("Invalid stage: {}", v))?;
+                            config.fallback_stage = FetchStage::try_from(stage_num)
+                                .map_err(|_| anyhow!("Stage must be 1, 2, or 3"))?;
                         }
 
                         "fallback-patterns" => {

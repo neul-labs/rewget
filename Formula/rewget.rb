@@ -4,7 +4,7 @@
 class Rewget < Formula
   desc "wget-compatible wrapper with automatic fallback"
   homepage "https://github.com/neul-labs/rewget"
-  version "1.0.0"
+  version "1.0.1"
   license "MIT"
 
   on_macos do

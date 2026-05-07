@@ -82,6 +82,18 @@ rewget handles these automatically by progressively escalating through detection
     brew install neul-labs/tap/rewget
     ```
 
+=== "npm"
+
+    ```bash
+    npm install -g rewget
+    ```
+
+=== "PyPI"
+
+    ```bash
+    pip install rewget
+    ```
+
 === "Install Script"
 
     ```bash

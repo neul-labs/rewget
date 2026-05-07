@@ -13,7 +13,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::sync::Arc;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 use tokio::runtime::Runtime;
 use tracing::{debug, info, warn};
 
@@ -25,208 +25,282 @@ const MAX_PAGE_LOAD_MS: u64 = 30000;
 
 /// Perform a JS preflight request using shared runtime
 pub fn fetch(request: Request, runtime: &Arc<Runtime>) -> Response {
-    // Auto-download Chromium if not installed (blocking operation)
-    if !chromium_installed() {
-        info!("Chromium not installed, downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
-        eprintln!("[rewget] Downloading Chrome for Testing v{} (~150MB, one-time setup)...", CHROMIUM_VERSION);
+    let mut session = PreflightSession::new(request);
 
-        if let Err(e) = download_chromium(|_downloaded, _total| {
-            // Progress is shown by wget/curl
-        }) {
-            return Response::error(
-                request.id,
-                &format!("Failed to download Chromium: {}. You can manually run: rewget --rewget-download-chromium", e),
-            );
-        }
-
-        eprintln!("[rewget] Chromium installed successfully");
-        info!("Chromium installed at: {}", chromium_path().display());
+    // Ensure Chromium is installed before entering async
+    if let Some(resp) = session.ensure_chromium() {
+        return resp;
     }
 
-    runtime.block_on(async { fetch_async(request).await })
+    runtime.block_on(async { session.run().await })
 }
 
-async fn fetch_async(request: Request) -> Response {
-    info!(
-        "Stage 3 request: {} {} (JS preflight)",
-        request.method, request.url
-    );
+/// State machine for the JS preflight lifecycle.
+#[derive(Debug, Clone)]
+#[allow(dead_code)]
+enum PreflightState {
+    Init,
+    ChromiumReady,
+    BrowserLaunching,
+    PageCreated,
+    Navigating,
+    WaitingForJs { condition: WaitCondition, start: Instant },
+    Extracting,
+    Complete { response: Response },
+    Failed { error: String },
+}
 
-    let chrome_path = chromium_path();
+/// Session that drives a single Stage 3 preflight request.
+struct PreflightSession {
+    state: PreflightState,
+    request: Request,
+}
 
-    // Configure browser
-    let config = match BrowserConfig::builder()
-        .chrome_executable(&chrome_path)
-        .arg("--headless=new")
-        .arg("--disable-gpu")
-        .arg("--no-sandbox")
-        .arg("--disable-dev-shm-usage")
-        .arg("--disable-extensions")
-        .arg("--disable-background-networking")
-        .arg("--disable-sync")
-        .arg("--disable-translate")
-        .arg("--mute-audio")
-        .arg("--no-first-run")
-        .arg("--safebrowsing-disable-auto-update")
-        .build()
-    {
-        Ok(c) => c,
-        Err(e) => return Response::error(request.id, &format!("Failed to configure browser: {}", e)),
-    };
-
-    // Launch browser
-    let (mut browser, mut handler) = match Browser::launch(config).await {
-        Ok(b) => b,
-        Err(e) => return Response::error(request.id, &format!("Failed to launch browser: {}", e)),
-    };
-
-    // Spawn handler task
-    let handler_task = tokio::spawn(async move {
-        while let Some(event) = handler.next().await {
-            // Handle browser events
-            debug!("Browser event: {:?}", event);
+impl PreflightSession {
+    fn new(request: Request) -> Self {
+        Self {
+            state: PreflightState::Init,
+            request,
         }
-    });
-
-    // Create new page
-    let page = match browser.new_page("about:blank").await {
-        Ok(p) => p,
-        Err(e) => return Response::error(request.id, &format!("Failed to create page: {}", e)),
-    };
-
-    // Navigate to URL
-    debug!("Navigating to {}", request.url);
-    if let Err(e) = page.goto(&request.url).await {
-        return Response::error(request.id, &format!("Failed to navigate: {}", e));
     }
 
-    // Wait for page load
-    let load_timeout = Duration::from_millis(MAX_PAGE_LOAD_MS);
-    if let Err(e) = tokio::time::timeout(load_timeout, page.wait_for_navigation()).await {
-        warn!("Page load timeout: {}", e);
-    }
+    /// Ensure Chromium is installed (synchronous check/download).
+    /// Returns `Some(Response)` if an error occurs, otherwise `None`.
+    fn ensure_chromium(&mut self) -> Option<Response> {
+        if !chromium_installed() {
+            info!("Chromium not installed, downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
+            eprintln!("[rewget] Downloading Chrome for Testing v{} (~150MB, one-time setup)...", CHROMIUM_VERSION);
 
-    // Wait for JS challenges (configurable or default)
-    let js_wait = request.js_wait.as_ref()
-        .and_then(|s| parse_wait_condition(s))
-        .unwrap_or(WaitCondition::Delay(DEFAULT_JS_WAIT_MS));
-
-    match js_wait {
-        WaitCondition::Delay(ms) => {
-            debug!("Waiting {}ms for JS challenges", ms);
-            tokio::time::sleep(Duration::from_millis(ms)).await;
-        }
-        WaitCondition::Selector(ref selector) => {
-            debug!("Waiting for selector: {}", selector);
-            // Use JavaScript to wait for selector
-            let js = format!(
-                r#"new Promise((resolve) => {{
-                    const check = () => {{
-                        if (document.querySelector('{}')) {{
-                            resolve(true);
-                        }} else {{
-                            setTimeout(check, 100);
-                        }}
-                    }};
-                    check();
-                }})"#,
-                selector.replace('\'', "\\'")
-            );
-            let timeout = Duration::from_millis(request.timeout_ms);
-            match tokio::time::timeout(timeout, page.evaluate(js)).await {
-                Ok(Ok(_)) => debug!("Selector found"),
-                Ok(Err(e)) => warn!("Selector wait failed: {}", e),
-                Err(_) => warn!("Selector wait timeout"),
+            if let Err(e) = download_chromium(|_downloaded, _total| {}) {
+                self.state = PreflightState::Failed {
+                    error: format!("Failed to download Chromium: {}", e),
+                };
+                return Some(Response::error(
+                    self.request.id,
+                    &format!("Failed to download Chromium: {}. You can manually run: rewget --rewget-download-chromium", e),
+                ));
             }
+
+            eprintln!("[rewget] Chromium installed successfully");
+            info!("Chromium installed at: {}", chromium_path().display());
         }
-        WaitCondition::NetworkIdle => {
-            debug!("Waiting for network idle");
-            // Simple approximation - wait a bit after load
-            tokio::time::sleep(Duration::from_millis(2000)).await;
-        }
+
+        self.state = PreflightState::ChromiumReady;
+        None
     }
 
-    // Get final URL (in case of redirects)
-    let final_url = page.url().await.unwrap_or_else(|_| Some(request.url.clone())).unwrap_or(request.url.clone());
-    debug!("Final URL: {}", final_url);
-
-    // Get page content
-    let content = match page.content().await {
-        Ok(c) => c,
-        Err(e) => return Response::error(request.id, &format!("Failed to get content: {}", e)),
-    };
-
-    // Get cookies
-    let cookies = page.get_cookies().await.unwrap_or_default();
-    debug!("Got {} cookies", cookies.len());
-
-    // Check for blocking patterns in content
-    let blocked = rewget_core::analyze_body(&content, &[]).is_some();
-    let block_reason = if blocked {
-        rewget_core::analyze_body(&content, &[]).map(|r| format!("{}", r))
-    } else {
-        None
-    };
-
-    // Close browser
-    let _ = browser.close().await;
-    handler_task.abort();
-
-    // Build response
-    let body_bytes = content.into_bytes();
-
-    // Write to file if output specified
-    let bytes_written = if let Some(output_path) = &request.output {
-        match File::create(output_path) {
-            Ok(mut file) => match file.write_all(&body_bytes) {
-                Ok(_) => Some(body_bytes.len() as u64),
-                Err(e) => {
-                    return Response::error(request.id, &format!("Failed to write output: {}", e))
-                }
-            },
-            Err(e) => {
-                return Response::error(request.id, &format!("Failed to create output: {}", e))
-            }
-        }
-    } else {
-        None
-    };
-
-    // Convert cookies to headers for response
-    let mut headers = HashMap::new();
-    if !cookies.is_empty() {
-        let cookie_str: Vec<String> = cookies
-            .iter()
-            .map(|c| format!("{}={}", c.name, c.value))
-            .collect();
-        headers.insert("Set-Cookie".to_string(), cookie_str.join("; "));
-    }
-    headers.insert("X-Final-URL".to_string(), final_url);
-
-    if blocked {
-        let mut resp = Response::blocked(
-            request.id,
-            200, // Page loaded but contains challenge
-            block_reason.as_deref().unwrap_or("JS challenge detected"),
+    /// Run the full preflight lifecycle asynchronously.
+    async fn run(mut self) -> Response {
+        info!(
+            "Stage 3 request: {} {} (JS preflight)",
+            self.request.method, self.request.url
         );
-        resp.headers = headers;
-        if bytes_written.is_none() {
-            resp.body = Some(body_bytes);
+
+        let chrome_path = chromium_path();
+
+        // -- BrowserLaunching --
+        self.state = PreflightState::BrowserLaunching;
+        let config = match BrowserConfig::builder()
+            .chrome_executable(&chrome_path)
+            .arg("--headless=new")
+            .arg("--disable-gpu")
+            .arg("--no-sandbox")
+            .arg("--disable-dev-shm-usage")
+            .arg("--disable-extensions")
+            .arg("--disable-background-networking")
+            .arg("--disable-sync")
+            .arg("--disable-translate")
+            .arg("--mute-audio")
+            .arg("--no-first-run")
+            .arg("--safebrowsing-disable-auto-update")
+            .build()
+        {
+            Ok(c) => c,
+            Err(e) => {
+                self.state = PreflightState::Failed {
+                    error: format!("Failed to configure browser: {}", e),
+                };
+                return Response::error(self.request.id, &format!("Failed to configure browser: {}", e));
+            }
+        };
+
+        let (mut browser, mut handler) = match Browser::launch(config).await {
+            Ok(b) => b,
+            Err(e) => {
+                self.state = PreflightState::Failed {
+                    error: format!("Failed to launch browser: {}", e),
+                };
+                return Response::error(self.request.id, &format!("Failed to launch browser: {}", e));
+            }
+        };
+
+        let handler_task = tokio::spawn(async move {
+            while let Some(event) = handler.next().await {
+                debug!("Browser event: {:?}", event);
+            }
+        });
+
+        // -- PageCreated --
+        self.state = PreflightState::PageCreated;
+        let page = match browser.new_page("about:blank").await {
+            Ok(p) => p,
+            Err(e) => {
+                self.state = PreflightState::Failed {
+                    error: format!("Failed to create page: {}", e),
+                };
+                return Response::error(self.request.id, &format!("Failed to create page: {}", e));
+            }
+        };
+
+        // -- Navigating --
+        self.state = PreflightState::Navigating;
+        debug!("Navigating to {}", self.request.url);
+        if let Err(e) = page.goto(&self.request.url).await {
+            self.state = PreflightState::Failed {
+                error: format!("Failed to navigate: {}", e),
+            };
+            return Response::error(self.request.id, &format!("Failed to navigate: {}", e));
         }
-        resp.bytes_written = bytes_written;
-        resp
-    } else {
-        let mut resp = Response::success(request.id, 200);
-        resp.headers = headers;
-        if bytes_written.is_none() {
-            resp.body = Some(body_bytes);
+
+        let load_timeout = Duration::from_millis(MAX_PAGE_LOAD_MS);
+        if let Err(e) = tokio::time::timeout(load_timeout, page.wait_for_navigation()).await {
+            warn!("Page load timeout: {}", e);
         }
-        resp.bytes_written = bytes_written;
-        resp
+
+        // -- WaitingForJs --
+        let js_wait = self.request.js_wait.as_ref()
+            .and_then(|s| parse_wait_condition(s))
+            .unwrap_or(WaitCondition::Delay(DEFAULT_JS_WAIT_MS));
+
+        self.state = PreflightState::WaitingForJs {
+            condition: js_wait.clone(),
+            start: Instant::now(),
+        };
+
+        match js_wait {
+            WaitCondition::Delay(ms) => {
+                debug!("Waiting {}ms for JS challenges", ms);
+                tokio::time::sleep(Duration::from_millis(ms)).await;
+            }
+            WaitCondition::Selector(ref selector) => {
+                debug!("Waiting for selector: {}", selector);
+                let js = format!(
+                    r#"new Promise((resolve) => {{
+                        const check = () => {{
+                            if (document.querySelector('{}')) {{
+                                resolve(true);
+                            }} else {{
+                                setTimeout(check, 100);
+                            }}
+                        }};
+                        check();
+                    }})"#,
+                    selector.replace('\'', "\\'")
+                );
+                let timeout = Duration::from_millis(self.request.timeout_ms);
+                match tokio::time::timeout(timeout, page.evaluate(js)).await {
+                    Ok(Ok(_)) => debug!("Selector found"),
+                    Ok(Err(e)) => warn!("Selector wait failed: {}", e),
+                    Err(_) => warn!("Selector wait timeout"),
+                }
+            }
+            WaitCondition::NetworkIdle => {
+                debug!("Waiting for network idle");
+                tokio::time::sleep(Duration::from_millis(2000)).await;
+            }
+        }
+
+        // -- Extracting --
+        self.state = PreflightState::Extracting;
+
+        let final_url = page.url().await.unwrap_or_else(|_| Some(self.request.url.clone())).unwrap_or(self.request.url.clone());
+        debug!("Final URL: {}", final_url);
+
+        let content = match page.content().await {
+            Ok(c) => c,
+            Err(e) => {
+                self.state = PreflightState::Failed {
+                    error: format!("Failed to get content: {}", e),
+                };
+                return Response::error(self.request.id, &format!("Failed to get content: {}", e));
+            }
+        };
+
+        let cookies = page.get_cookies().await.unwrap_or_default();
+        debug!("Got {} cookies", cookies.len());
+
+        // Check for blocking patterns in content
+        let block_reason = rewget_core::analyze_body(&content, &[]).map(|r| format!("{}", r));
+        let blocked = block_reason.is_some();
+
+        // Close browser
+        let _ = browser.close().await;
+        handler_task.abort();
+
+        let body_bytes = content.into_bytes();
+
+        // Write to file if output specified
+        let bytes_written = if let Some(output_path) = &self.request.output {
+            match File::create(output_path) {
+                Ok(mut file) => match file.write_all(&body_bytes) {
+                    Ok(_) => Some(body_bytes.len() as u64),
+                    Err(e) => {
+                        self.state = PreflightState::Failed {
+                            error: format!("Failed to write output: {}", e),
+                        };
+                        return Response::error(self.request.id, &format!("Failed to write output: {}", e))
+                    }
+                },
+                Err(e) => {
+                    self.state = PreflightState::Failed {
+                        error: format!("Failed to create output: {}", e),
+                    };
+                    return Response::error(self.request.id, &format!("Failed to create output: {}", e))
+                }
+            }
+        } else {
+            None
+        };
+
+        // Convert cookies to headers for response
+        let mut headers = HashMap::new();
+        if !cookies.is_empty() {
+            let cookie_str: Vec<String> = cookies
+                .iter()
+                .map(|c| format!("{}={}", c.name, c.value))
+                .collect();
+            headers.insert("Set-Cookie".to_string(), cookie_str.join("; "));
+        }
+        headers.insert("X-Final-URL".to_string(), final_url);
+
+        if blocked {
+            let mut resp = Response::blocked(
+                self.request.id,
+                503, // Service Unavailable (challenge page)
+                block_reason.as_deref().unwrap_or("JS challenge detected"),
+            );
+            resp.headers = headers;
+            if bytes_written.is_none() {
+                resp.body = Some(body_bytes);
+            }
+            resp.bytes_written = bytes_written;
+            self.state = PreflightState::Complete { response: resp.clone() };
+            resp
+        } else {
+            let mut resp = Response::success(self.request.id, 200);
+            resp.headers = headers;
+            if bytes_written.is_none() {
+                resp.body = Some(body_bytes);
+            }
+            resp.bytes_written = bytes_written;
+            self.state = PreflightState::Complete { response: resp.clone() };
+            resp
+        }
     }
 }
 
 /// Wait condition for JS challenges
+#[derive(Debug, Clone)]
 enum WaitCondition {
     /// Wait for a fixed delay in milliseconds
     Delay(u64),
@@ -238,10 +312,10 @@ enum WaitCondition {
 
 /// Parse a wait condition string
 fn parse_wait_condition(s: &str) -> Option<WaitCondition> {
-    if s.starts_with("delay:") {
-        s[6..].parse().ok().map(WaitCondition::Delay)
-    } else if s.starts_with("selector:") {
-        Some(WaitCondition::Selector(s[9..].to_string()))
+    if let Some(rest) = s.strip_prefix("delay:") {
+        rest.parse().ok().map(WaitCondition::Delay)
+    } else if let Some(rest) = s.strip_prefix("selector:") {
+        Some(WaitCondition::Selector(rest.to_string()))
     } else if s == "networkidle" {
         Some(WaitCondition::NetworkIdle)
     } else if let Ok(ms) = s.parse::<u64>() {

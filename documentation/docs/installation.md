@@ -14,6 +14,22 @@ brew install neul-labs/tap/rewget
 
 This installs both `rewget` and `rewgetd` binaries, along with shell completions and man pages.
 
+### npm (All Platforms)
+
+If you have Node.js installed:
+
+```bash
+npm install -g rewget
+```
+
+### PyPI (All Platforms)
+
+If you have Python installed:
+
+```bash
+pip install rewget
+```
+
 ### Cargo (All Platforms)
 
 If you have Rust installed:
@@ -96,7 +112,7 @@ cargo install --path crates/rewget
 
 ```bash
 rewget --rewget-version
-# rewget 1.0.0
+# rewget 1.0.1
 
 rewget --rewget-help
 ```

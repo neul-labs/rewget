@@ -4,7 +4,7 @@
 
 set -e
 
-VERSION="${RWGET_VERSION:-1.0.0}"
+VERSION="${RWGET_VERSION:-1.0.1}"
 INSTALL_DIR="${RWGET_INSTALL_DIR:-$HOME/.local/bin}"
 GITHUB_REPO="neul-labs/rewget"
 

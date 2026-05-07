@@ -5,7 +5,7 @@
 use anyhow::{Context, Result};
 use nng::options::Options;
 use nng::{Message, Protocol, Socket};
-use rewget_core::{socket_path, Request, Response};
+use rewget_core::{socket_path, FetchStage, Request, Response};
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -70,7 +70,7 @@ pub fn stage2_fetch(
     timeout_ms: u64,
 ) -> Result<Response> {
     let request = Request::get(url)
-        .with_stage(2)
+        .with_stage(FetchStage::Impersonate)
         .with_timeout(timeout_ms);
 
     let request = if let Some(path) = output {
@@ -96,7 +96,7 @@ pub fn stage3_fetch(
     timeout_ms: u64,
 ) -> Result<Response> {
     let mut request = Request::get(url)
-        .with_stage(3)
+        .with_stage(FetchStage::Preflight)
         .with_timeout(timeout_ms);
 
     if let Some(path) = output {
@@ -135,10 +135,21 @@ fn spawn_daemon() -> Result<()> {
     // Find the daemon binary
     let daemon_path = find_daemon_binary()?;
 
+    let log_path = rewget_core::DomainCache::cache_dir().join("rewgetd.log");
+    let stderr = if let Ok(file) = std::fs::OpenOptions::new()
+        .create(true)
+        .append(true)
+        .open(&log_path)
+    {
+        std::process::Stdio::from(file)
+    } else {
+        std::process::Stdio::null()
+    };
+
     std::process::Command::new(&daemon_path)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
+        .stderr(stderr)
         .spawn()
         .context(format!("Failed to spawn {}", daemon_path.display()))?;
 

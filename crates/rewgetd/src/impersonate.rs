@@ -35,12 +35,10 @@ impl ClientPool {
     pub fn get_or_create(&self, profile: Option<&str>) -> Result<Client, String> {
         let profile_name = profile.unwrap_or("chrome131");
 
-        // Check if client exists
-        {
-            let clients = self.clients.lock().unwrap();
-            if let Some(client) = clients.get(profile_name) {
-                return Ok(client.clone());
-            }
+        let mut clients = self.clients.lock().unwrap();
+
+        if let Some(client) = clients.get(profile_name) {
+            return Ok(client.clone());
         }
 
         // Create new client (no timeout - handled per-request)
@@ -50,8 +48,6 @@ impl ClientPool {
             .build()
             .map_err(|e| format!("Failed to create client: {}", e))?;
 
-        // Store and return
-        let mut clients = self.clients.lock().unwrap();
         clients.insert(profile_name.to_string(), client.clone());
         debug!("Created new client for profile: {}", profile_name);
 
@@ -63,7 +59,7 @@ impl ClientPool {
 static CLIENT_POOL: OnceLock<ClientPool> = OnceLock::new();
 
 fn get_client_pool() -> &'static ClientPool {
-    CLIENT_POOL.get_or_init(|| ClientPool::new())
+    CLIENT_POOL.get_or_init(ClientPool::new)
 }
 
 /// Available browser profiles

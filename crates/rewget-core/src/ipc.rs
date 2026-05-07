@@ -2,6 +2,7 @@
 //!
 //! Uses nng for request/reply pattern over Unix domain sockets (or named pipes on Windows).
 
+use crate::FetchStage;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -14,7 +15,7 @@ pub fn socket_path() -> PathBuf {
     #[cfg(unix)]
     {
         dirs::runtime_dir()
-            .or_else(|| dirs::cache_dir())
+            .or_else(dirs::cache_dir)
             .unwrap_or_else(|| PathBuf::from("/tmp"))
             .join("rewget")
             .join("rewgetd.sock")
@@ -61,8 +62,8 @@ pub struct Request {
     /// Timeout in milliseconds
     pub timeout_ms: u64,
 
-    /// Stage to execute (2 or 3)
-    pub stage: u8,
+    /// Stage to execute (Impersonate or Preflight)
+    pub stage: FetchStage,
 
     /// JS wait condition for Stage 3
     pub js_wait: Option<String>,
@@ -80,7 +81,7 @@ impl Request {
             profile: None,
             output: None,
             timeout_ms: 15000,
-            stage: 2,
+            stage: FetchStage::Impersonate,
             js_wait: None,
         }
     }
@@ -104,7 +105,7 @@ impl Request {
     }
 
     /// Set stage
-    pub fn with_stage(mut self, stage: u8) -> Self {
+    pub fn with_stage(mut self, stage: FetchStage) -> Self {
         self.stage = stage;
         self
     }
@@ -216,12 +217,12 @@ mod tests {
         let req = Request::get("https://example.com")
             .with_profile("chrome131")
             .with_timeout(5000)
-            .with_stage(2);
+            .with_stage(FetchStage::Impersonate);
 
         assert_eq!(req.url, "https://example.com");
         assert_eq!(req.profile, Some("chrome131".to_string()));
         assert_eq!(req.timeout_ms, 5000);
-        assert_eq!(req.stage, 2);
+        assert_eq!(req.stage, FetchStage::Impersonate);
     }
 
     #[test]

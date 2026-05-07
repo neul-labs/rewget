@@ -3,7 +3,7 @@
 //! Remembers which stage worked for each domain to skip failed stages
 //! on subsequent requests. Cache entries expire after 7 days.
 
-use crate::Result;
+use crate::{FetchStage, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
@@ -23,8 +23,8 @@ pub struct DomainCache {
 /// A cached stage result for a domain
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CacheEntry {
-    /// The stage that worked (1, 2, or 3)
-    pub stage: u8,
+    /// The stage that worked
+    pub stage: FetchStage,
 
     /// Unix timestamp when this entry was created
     pub timestamp: u64,
@@ -59,7 +59,7 @@ impl DomainCache {
     }
 
     /// Get the cached stage for a domain, if not expired
-    pub fn get(&self, domain: &str) -> Option<u8> {
+    pub fn get(&self, domain: &str) -> Option<FetchStage> {
         let entry = self.entries.get(domain)?;
 
         // Check expiry
@@ -72,7 +72,7 @@ impl DomainCache {
     }
 
     /// Set the working stage for a domain
-    pub fn set(&mut self, domain: &str, stage: u8) {
+    pub fn set(&mut self, domain: &str, stage: FetchStage) {
         self.entries.insert(
             domain.to_string(),
             CacheEntry {
@@ -206,17 +206,17 @@ mod tests {
     #[test]
     fn test_cache_set_get() {
         let mut cache = DomainCache::default();
-        cache.set("example.com", 2);
+        cache.set("example.com", FetchStage::Impersonate);
 
-        assert_eq!(cache.get("example.com"), Some(2));
+        assert_eq!(cache.get("example.com"), Some(FetchStage::Impersonate));
         assert_eq!(cache.get("other.com"), None);
     }
 
     #[test]
     fn test_cache_clear() {
         let mut cache = DomainCache::default();
-        cache.set("example.com", 2);
-        cache.set("other.com", 3);
+        cache.set("example.com", FetchStage::Impersonate);
+        cache.set("other.com", FetchStage::Preflight);
 
         assert_eq!(cache.len(), 2);
         cache.clear();
@@ -231,7 +231,7 @@ mod tests {
         cache.entries.insert(
             "old.com".to_string(),
             CacheEntry {
-                stage: 2,
+                stage: FetchStage::Impersonate,
                 timestamp: 0, // Very old
             },
         );
@@ -245,13 +245,13 @@ mod tests {
         let mut cache = DomainCache::default();
 
         // Add a fresh entry
-        cache.set("fresh.com", 2);
+        cache.set("fresh.com", FetchStage::Impersonate);
 
         // Add an expired entry
         cache.entries.insert(
             "old.com".to_string(),
             CacheEntry {
-                stage: 2,
+                stage: FetchStage::Impersonate,
                 timestamp: 0,
             },
         );

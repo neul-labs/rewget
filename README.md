@@ -98,6 +98,12 @@ Results are cached per-domain (7-day TTL), so subsequent requests skip straight 
 # Homebrew (macOS / Linux)
 brew install neul-labs/tap/rewget
 
+# npm (all platforms)
+npm install -g rewget
+
+# PyPI (all platforms)
+pip install rewget
+
 # Cargo (from source)
 cargo install rewget
 ```

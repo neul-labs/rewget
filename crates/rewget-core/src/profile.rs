@@ -319,13 +319,12 @@ impl ProfileCollection {
         let remote = Self::fetch_remote(url)?;
 
         // Verify signature if required
-        if verify {
-            if !remote.verify_signature(PROFILE_PUBLIC_KEY)? {
+        if verify
+            && !remote.verify_signature(PROFILE_PUBLIC_KEY)? {
                 return Err(crate::Error::Config(
                     "Profile signature verification failed. Use --rewget-no-verify to skip.".to_string()
                 ));
             }
-        }
 
         // Load existing profiles
         let existing = Self::load();

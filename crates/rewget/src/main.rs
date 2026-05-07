@@ -15,7 +15,11 @@ use args::Args;
 use cli::generate_completions;
 
 fn main() -> Result<()> {
-    let args = Args::parse(std::env::args().collect())?;
+        let mut args = Args::parse(std::env::args().collect())?;
+
+        // Load config file and merge with CLI args (CLI takes precedence)
+        let config_file = rewget_core::ConfigFile::load();
+        config_file.merge_into(&mut args.config);
 
     match args.command {
         args::Command::Version => {

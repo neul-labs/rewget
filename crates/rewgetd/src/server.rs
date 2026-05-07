@@ -3,7 +3,7 @@
 use anyhow::{Context, Result};
 use nng::options::Options;
 use nng::{Protocol, Socket};
-use rewget_core::{socket_path, Request, Response, DaemonStatus};
+use rewget_core::{socket_path, FetchStage, Request, Response, DaemonStatus};
 use std::fs;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -120,9 +120,9 @@ fn handle_message(msg: &[u8], runtime: &Arc<Runtime>) -> Response {
 /// Handle a fetch request
 fn handle_request(request: Request, runtime: &Arc<Runtime>) -> Response {
     match request.stage {
-        2 => impersonate::fetch(request, runtime),
-        3 => crate::preflight::fetch(request, runtime),
-        _ => Response::error(request.id, &format!("Invalid stage: {}", request.stage)),
+        FetchStage::Impersonate => impersonate::fetch(request, runtime),
+        FetchStage::Preflight => crate::preflight::fetch(request, runtime),
+        FetchStage::Wget => Response::error(request.id, "Stage 1 (wget) should not be requested from daemon"),
     }
 }
 

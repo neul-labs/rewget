@@ -1,6 +1,6 @@
 //! Configuration for rewget
 
-use crate::Engine;
+use crate::{Engine, FetchStage};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -25,8 +25,8 @@ pub struct Config {
     /// Enable debug output
     pub debug: bool,
 
-    /// Stage to start at (1, 2, or 3)
-    pub fallback_stage: u8,
+    /// Stage to start at (Wget, Impersonate, or Preflight)
+    pub fallback_stage: FetchStage,
 
     /// Disable domain stage caching
     pub no_cache: bool,
@@ -55,7 +55,7 @@ impl Default for Config {
             body_detection: true,
             quiet: false,
             debug: false,
-            fallback_stage: 1,
+            fallback_stage: FetchStage::Preflight,
             no_cache: false,
             profile: None,
             daemon_mode: DaemonMode::Auto,
@@ -173,5 +173,34 @@ impl ConfigFile {
     /// Get config file path
     pub fn config_path() -> Option<PathBuf> {
         Self::config_dir().map(|p| p.join("config.toml"))
+    }
+
+    /// Load config from disk, or return default if not found.
+    pub fn load() -> Self {
+        match Self::config_path() {
+            Some(path) if path.exists() => {
+                match std::fs::read_to_string(&path) {
+                    Ok(content) => toml::from_str(&content).unwrap_or_default(),
+                    Err(_) => Self::default(),
+                }
+            }
+            _ => Self::default(),
+        }
+    }
+
+    /// Merge file config into a runtime `Config`, with file values acting as defaults.
+    pub fn merge_into(&self, config: &mut Config) {
+        if !self.fallback.enabled {
+            config.no_fallback = true;
+        }
+        if !config.fallback_codes.is_empty() && !self.fallback.codes.is_empty() {
+            config.fallback_codes = self.fallback.codes.clone();
+        }
+        if !self.fallback.body_detection {
+            config.body_detection = false;
+        }
+        if config.profile.is_none() && !self.profiles.default.is_empty() {
+            config.profile = Some(self.profiles.default.clone());
+        }
     }
 }
