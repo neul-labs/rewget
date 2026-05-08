@@ -234,72 +234,58 @@ jobs:
           cd homebrew-tap
 
           PLATFORMS=(
-            "rewget-macos-x64:x86_64-apple-darwin"
-            "rewget-macos-arm64:aarch64-apple-darwin"
-            "rewget-linux-x64:x86_64-unknown-linux-gnu"
-            "rewget-linux-arm64:aarch64-unknown-linux-gnu"
+            "rewget-macos-x64"
+            "rewget-macos-arm64"
+            "rewget-linux-x64"
+            "rewget-linux-arm64"
           )
 
-          SHA_MACOS_X64=""
-          SHA_MACOS_ARM64=""
-          SHA_LINUX_X64=""
-          SHA_LINUX_ARM64=""
-
-          for entry in "${PLATFORMS[@]}"; do
-            ARTIFACT="${entry%%:*}"
-            PLATFORM="${entry##*:}"
+          for ARTIFACT in "${PLATFORMS[@]}"; do
             URL="https://github.com/neul-labs/rewget/releases/download/v${VERSION}/${ARTIFACT}.tar.gz"
             curl -sSL "$URL" -o "/tmp/${ARTIFACT}.tar.gz"
             SHA=$(sha256sum "/tmp/${ARTIFACT}.tar.gz" | cut -d' ' -f1)
-            case "$ARTIFACT" in
-              rewget-macos-x64) SHA_MACOS_X64="$SHA" ;;
-              rewget-macos-arm64) SHA_MACOS_ARM64="$SHA" ;;
-              rewget-linux-x64) SHA_LINUX_X64="$SHA" ;;
-              rewget-linux-arm64) SHA_LINUX_ARM64="$SHA" ;;
-            esac
+            printf '%s\n' "${SHA}" > "/tmp/${ARTIFACT}.sha"
           done
 
-          cat > Formula/rewget.rb <<'EOF'
-class Rewget < Formula
-  desc "wget-compatible wrapper with automatic fallback"
-  homepage "https://github.com/neul-labs/rewget"
-  version "${VERSION}"
-  license "MIT"
+          SHA_MACOS_X64=$(cat /tmp/rewget-macos-x64.sha)
+          SHA_MACOS_ARM64=$(cat /tmp/rewget-macos-arm64.sha)
+          SHA_LINUX_X64=$(cat /tmp/rewget-linux-x64.sha)
+          SHA_LINUX_ARM64=$(cat /tmp/rewget-linux-arm64.sha)
 
-  on_macos do
-    if Hardware::CPU.intel?
-      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-macos-x64.tar.gz"
-      sha256 "${SHA_MACOS_X64}"
-    else
-      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-macos-arm64.tar.gz"
-      sha256 "${SHA_MACOS_ARM64}"
-    end
-  end
-
-  on_linux do
-    if Hardware::CPU.intel?
-      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-linux-x64.tar.gz"
-      sha256 "${SHA_LINUX_X64}"
-    else
-      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-linux-arm64.tar.gz"
-      sha256 "${SHA_LINUX_ARM64}"
-    end
-  end
-
-  depends_on "wget"
-
-  def install
-    bin.install "rewget"
-    bin.install "rewgetd"
-    generate_completions_from_executable(bin/"rewget", "--rewget-completions")
-    man1.install "rewget.1" if File.exist?("rewget.1")
-  end
-
-  test do
-    assert_match "rewget #{version}", shell_output("#{bin}/rewget --rewget-version")
-  end
-end
-EOF
+          printf '%s\n' 'class Rewget < Formula' > Formula/rewget.rb
+          printf '  desc "wget-compatible wrapper with automatic fallback"\n' >> Formula/rewget.rb
+          printf '  homepage "https://github.com/neul-labs/rewget"\n' >> Formula/rewget.rb
+          printf '  version "%s"\n' "$VERSION" >> Formula/rewget.rb
+          printf '  license "MIT"\n\n' >> Formula/rewget.rb
+          printf '  on_macos do\n' >> Formula/rewget.rb
+          printf '    if Hardware::CPU.intel?\n' >> Formula/rewget.rb
+          printf '      url "https://github.com/neul-labs/rewget/releases/download/v%s/rewget-macos-x64.tar.gz"\n' "$VERSION" >> Formula/rewget.rb
+          printf '      sha256 "%s"\n' "$SHA_MACOS_X64" >> Formula/rewget.rb
+          printf '    else\n' >> Formula/rewget.rb
+          printf '      url "https://github.com/neul-labs/rewget/releases/download/v%s/rewget-macos-arm64.tar.gz"\n' "$VERSION" >> Formula/rewget.rb
+          printf '      sha256 "%s"\n' "$SHA_MACOS_ARM64" >> Formula/rewget.rb
+          printf '    end\n' >> Formula/rewget.rb
+          printf '  end\n\n' >> Formula/rewget.rb
+          printf '  on_linux do\n' >> Formula/rewget.rb
+          printf '    if Hardware::CPU.intel?\n' >> Formula/rewget.rb
+          printf '      url "https://github.com/neul-labs/rewget/releases/download/v%s/rewget-linux-x64.tar.gz"\n' "$VERSION" >> Formula/rewget.rb
+          printf '      sha256 "%s"\n' "$SHA_LINUX_X64" >> Formula/rewget.rb
+          printf '    else\n' >> Formula/rewget.rb
+          printf '      url "https://github.com/neul-labs/rewget/releases/download/v%s/rewget-linux-arm64.tar.gz"\n' "$VERSION" >> Formula/rewget.rb
+          printf '      sha256 "%s"\n' "$SHA_LINUX_ARM64" >> Formula/rewget.rb
+          printf '    end\n' >> Formula/rewget.rb
+          printf '  end\n\n' >> Formula/rewget.rb
+          printf '  depends_on "wget"\n\n' >> Formula/rewget.rb
+          printf '  def install\n' >> Formula/rewget.rb
+          printf '    bin.install "rewget"\n' >> Formula/rewget.rb
+          printf '    bin.install "rewgetd"\n' >> Formula/rewget.rb
+          printf '    generate_completions_from_executable(bin/"rewget", "--rewget-completions")\n' >> Formula/rewget.rb
+          printf '    man1.install "rewget.1" if File.exist?("rewget.1")\n' >> Formula/rewget.rb
+          printf '  end\n\n' >> Formula/rewget.rb
+          printf '  test do\n' >> Formula/rewget.rb
+          printf '    assert_match "rewget #{version}", shell_output("#{bin}/rewget --rewget-version")\n' >> Formula/rewget.rb
+          printf '  end\n' >> Formula/rewget.rb
+          printf 'end\n' >> Formula/rewget.rb
 
       - name: Commit and push formula update
         working-directory: homebrew-tap
