@@ -51,9 +51,6 @@ jobs:
           - os: macos-latest
             target: aarch64-apple-darwin
             artifact: rewget-macos-arm64
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
-            artifact: rewget-windows-x64
 
     steps:
       - uses: actions/checkout@v4
@@ -103,41 +100,12 @@ jobs:
           sha256sum "${{ matrix.artifact }}.tar.gz" > "${{ matrix.artifact }}.tar.gz.sha256"
           echo "SHA256=$(cat ${{ matrix.artifact }}.tar.gz.sha256 | cut -d' ' -f1)" >> "$GITHUB_ENV"
 
-      - name: Package release (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $VERSION = $env:GITHUB_REF_NAME -replace '^v',''
-          $PKG_DIR = "target/pkg/${{ matrix.artifact }}"
-          New-Item -ItemType Directory -Force -Path "$PKG_DIR"
-          Copy-Item "target/${{ matrix.target }}/release/rewget.exe" "$PKG_DIR/"
-          Copy-Item "target/${{ matrix.target }}/release/rewgetd.exe" "$PKG_DIR/"
-          Copy-Item "README.md" "$PKG_DIR/"
-          Copy-Item "LICENSE" "$PKG_DIR/" -ErrorAction SilentlyContinue
-          $MAN = Get-ChildItem -Path "target/${{ matrix.target }}/release/build/rewget-*/out/man/rewget.1" -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($MAN) { Copy-Item $MAN.FullName "$PKG_DIR/" }
-          Compress-Archive -Path "$PKG_DIR/*" -DestinationPath "target/pkg/${{ matrix.artifact }}.zip" -Force
-          $HASH = (Get-FileHash -Path "target/pkg/${{ matrix.artifact }}.zip" -Algorithm SHA256).Hash
-          "$HASH  ${{ matrix.artifact }}.zip" | Out-File -FilePath "target/pkg/${{ matrix.artifact }}.zip.sha256"
-          "SHA256=$HASH" | Out-File -FilePath $env:GITHUB_ENV -Append
-
-      - name: Upload Release Asset (Unix)
-        if: runner.os != 'Windows'
+      - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
           files: |
             target/pkg/${{ matrix.artifact }}.tar.gz
             target/pkg/${{ matrix.artifact }}.tar.gz.sha256
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Release Asset (Windows)
-        if: runner.os == 'Windows'
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            target/pkg/${{ matrix.artifact }}.zip
-            target/pkg/${{ matrix.artifact }}.zip.sha256
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

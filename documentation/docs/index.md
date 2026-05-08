@@ -72,7 +72,7 @@ rewget handles these automatically by progressively escalating through detection
 | **Domain Caching** | Remembers successful stage per domain (7-day TTL) |
 | **Auto Chromium** | Downloads browser on first use (~150MB) |
 | **Remote Updates** | Keep profiles current with `--rewget-update-profiles` |
-| **Cross-Platform** | Linux, macOS, Windows |
+| **Cross-Platform** | Linux, macOS |
 
 ## Installation
 

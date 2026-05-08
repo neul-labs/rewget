@@ -213,7 +213,7 @@ Only if you trust the profile source. This disables signature verification, whic
 
 ### Does rewget work on Windows?
 
-Yes. rewget supports Windows x64. Some features use PowerShell for Chromium download.
+Not yet. Windows support is planned but not currently available. For now, rewget works on Linux and macOS.
 
 ### Does rewget work on macOS?
 

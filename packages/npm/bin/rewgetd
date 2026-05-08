@@ -4,6 +4,6 @@
 const { spawnSync } = require("child_process");
 const path = require("path");
 
-const bin = path.join(__dirname, process.platform === "win32" ? "rewgetd.exe" : "rewgetd");
+const bin = path.join(__dirname, "rewgetd");
 const { status } = spawnSync(bin, process.argv.slice(2), { stdio: "inherit" });
 process.exit(status ?? 0);

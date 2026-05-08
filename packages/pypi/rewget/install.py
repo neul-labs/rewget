@@ -20,7 +20,6 @@ def get_platform():
     os_map = {
         "darwin": "apple-darwin",
         "linux": "unknown-linux-gnu",
-        "windows": "pc-windows-msvc",
     }
 
     arch_map = {
@@ -36,7 +35,7 @@ def get_platform():
     if not os_name or not arch:
         raise RuntimeError(
             f"Unsupported platform: {system} {machine}. "
-            "Supported: macOS (Intel/ARM), Linux (x64/ARM64), Windows (x64)"
+            "Supported: macOS (Intel/ARM), Linux (x64/ARM64)"
         )
 
     return arch, os_name
@@ -48,13 +47,10 @@ def get_artifact_name():
 
     if system == "darwin":
         name = "rewget-macos-arm64" if arch == "aarch64" else "rewget-macos-x64"
-    elif system == "linux":
-        name = "rewget-linux-arm64" if arch == "aarch64" else "rewget-linux-x64"
     else:
-        name = "rewget-windows-x64"
+        name = "rewget-linux-arm64" if arch == "aarch64" else "rewget-linux-x64"
 
-    ext = "zip" if system == "windows" else "tar.gz"
-    return f"{name}.{ext}"
+    return f"{name}.tar.gz"
 
 
 def download_binary(install_dir: Path) -> None:
@@ -63,8 +59,8 @@ def download_binary(install_dir: Path) -> None:
     url = f"https://github.com/{REPO}/releases/download/v{VERSION}/{artifact}"
     temp_file = install_dir / artifact
 
-    rewget_bin = "rewget.exe" if plat.system().lower() == "windows" else "rewget"
-    rewgetd_bin = "rewgetd.exe" if plat.system().lower() == "windows" else "rewgetd"
+    rewget_bin = "rewget"
+    rewgetd_bin = "rewgetd"
 
     if (install_dir / rewget_bin).exists():
         return
@@ -82,31 +78,17 @@ def download_binary(install_dir: Path) -> None:
             with open(temp_file, "wb") as f:
                 shutil.copyfileobj(response, f)
 
-        if artifact.endswith(".zip"):
-            with zipfile.ZipFile(temp_file, "r") as z:
-                for member in z.namelist():
-                    # Strip leading directory if present
-                    parts = member.split("/", 1)
-                    if len(parts) > 1 and parts[1]:
-                        z.extract(member, install_dir)
-                        extracted = install_dir / member
-                        target = install_dir / parts[1]
-                        if extracted != target:
-                            extracted.rename(target)
-        else:
-            with tarfile.open(temp_file, "r:gz") as tar:
-                for member in tar.getmembers():
-                    parts = member.name.split("/", 1)
-                    if len(parts) > 1 and parts[1]:
-                        member.name = parts[1]
-                        tar.extract(member, install_dir)
+        with tarfile.open(temp_file, "r:gz") as tar:
+            for member in tar.getmembers():
+                parts = member.name.split("/", 1)
+                if len(parts) > 1 and parts[1]:
+                    member.name = parts[1]
+                    tar.extract(member, install_dir)
 
         temp_file.unlink(missing_ok=True)
 
-        # Make executable on Unix
-        if plat.system().lower() != "windows":
-            (install_dir / rewget_bin).chmod(0o755)
-            (install_dir / rewgetd_bin).chmod(0o755)
+        (install_dir / rewget_bin).chmod(0o755)
+        (install_dir / rewgetd_bin).chmod(0o755)
 
         print("rewget installed successfully.")
     except Exception as e:

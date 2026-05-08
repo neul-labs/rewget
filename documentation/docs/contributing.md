@@ -187,7 +187,6 @@ cargo run -- --rewget-profile=firefox_136 --rewget-debug https://example.com/
 ### Medium Priority
 
 - [ ] Additional detection patterns
-- [ ] Windows installer (winget/chocolatey)
 - [ ] Configuration file support
 - [ ] Proxy support improvements
 

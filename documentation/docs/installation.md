@@ -1,6 +1,6 @@
 # Installation
 
-rewget supports Linux, macOS, and Windows. Choose your preferred installation method below.
+rewget supports Linux and macOS. Choose your preferred installation method below.
 
 ## Package Managers
 
@@ -52,12 +52,6 @@ Or with custom install directory:
 RWGET_INSTALL_DIR=/usr/local/bin curl -fsSL https://rewget.dev/install.sh | sh
 ```
 
-### Windows (PowerShell)
-
-```powershell
-irm https://rewget.dev/install.ps1 | iex
-```
-
 ## Manual Installation
 
 ### Download Pre-built Binaries
@@ -70,21 +64,14 @@ Download the appropriate archive for your platform from the [releases page](http
 | Linux | ARM64 | `rewget-aarch64-unknown-linux-gnu.tar.gz` |
 | macOS | x86_64 (Intel) | `rewget-x86_64-apple-darwin.tar.gz` |
 | macOS | ARM64 (Apple Silicon) | `rewget-aarch64-apple-darwin.tar.gz` |
-| Windows | x86_64 | `rewget-x86_64-pc-windows-gnu.zip` |
 
 Extract and install:
 
-=== "Linux / macOS"
-
-    ```bash
-    tar -xzf rewget-*.tar.gz
-    sudo install -m 755 rewget /usr/local/bin/
-    sudo install -m 755 rewgetd /usr/local/bin/
-    ```
-
-=== "Windows"
-
-    Extract the zip file and add the directory to your PATH.
+```bash
+tar -xzf rewget-*.tar.gz
+sudo install -m 755 rewget /usr/local/bin/
+sudo install -m 755 rewgetd /usr/local/bin/
+```
 
 ### Build from Source
 
@@ -145,13 +132,6 @@ Enable tab completion for rewget commands:
     rewget --rewget-completions=fish | source
     ```
 
-=== "PowerShell"
-
-    Add to your PowerShell profile:
-
-    ```powershell
-    rewget --rewget-completions=powershell | Out-String | Invoke-Expression
-    ```
 
 ### Replace wget (Optional)
 
@@ -169,11 +149,6 @@ To use rewget as your default wget, add an alias:
     alias wget='rewget'
     ```
 
-=== "PowerShell"
-
-    ```powershell
-    Set-Alias -Name wget -Value rewget
-    ```
 
 ### Pre-download Chromium (Optional)
 
@@ -206,10 +181,6 @@ rewget requires `wget` or `wget2` to be installed on your system:
     ```bash
     brew install wget
     ```
-
-=== "Windows"
-
-    wget is typically available via Git Bash, WSL, or can be downloaded from [GNU wget](https://www.gnu.org/software/wget/).
 
 ## Uninstall
 

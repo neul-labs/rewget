@@ -16,7 +16,6 @@ function getPlatform() {
   const osMap = {
     darwin: "apple-darwin",
     linux: "unknown-linux-gnu",
-    win32: "pc-windows-msvc",
   };
 
   const archMap = {
@@ -29,7 +28,7 @@ function getPlatform() {
 
   if (!os || !mappedArch) {
     console.error(`Unsupported platform: ${platform} ${arch}`);
-    console.error("rewget supports: macOS (Intel/ARM), Linux (x64/ARM64), Windows (x64)");
+    console.error("rewget supports: macOS (Intel/ARM), Linux (x64/ARM64)");
     process.exit(1);
   }
 
@@ -38,19 +37,15 @@ function getPlatform() {
 
 function getArtifactName() {
   const { arch, os } = getPlatform();
-  const ext = process.platform === "win32" ? "zip" : "tar.gz";
 
   if (process.platform === "darwin") {
     return os === "apple-darwin" && arch === "x86_64"
-      ? `rewget-macos-x64.${ext}`
-      : `rewget-macos-arm64.${ext}`;
+      ? `rewget-macos-x64.tar.gz`
+      : `rewget-macos-arm64.tar.gz`;
   }
-  if (process.platform === "linux") {
-    return arch === "x86_64"
-      ? `rewget-linux-x64.${ext}`
-      : `rewget-linux-arm64.${ext}`;
-  }
-  return `rewget-windows-x64.${ext}`;
+  return arch === "x86_64"
+    ? `rewget-linux-x64.tar.gz`
+    : `rewget-linux-arm64.tar.gz`;
 }
 
 function downloadFile(url, dest) {
@@ -84,9 +79,8 @@ async function install() {
   const url = `https://github.com/${REPO}/releases/download/v${VERSION}/${artifact}`;
   const tempFile = path.join(__dirname, artifact);
 
-  // Check if binaries already exist
-  const rewgetBin = process.platform === "win32" ? "rewget.exe" : "rewget";
-  const rewgetdBin = process.platform === "win32" ? "rewgetd.exe" : "rewgetd";
+  const rewgetBin = "rewget";
+  const rewgetdBin = "rewgetd";
 
   if (fs.existsSync(path.join(binDir, rewgetBin))) {
     console.log("rewget binaries already installed.");
@@ -99,24 +93,14 @@ async function install() {
   try {
     await downloadFile(url, tempFile);
 
-    if (artifact.endsWith(".zip")) {
-      // Windows: use PowerShell Expand-Archive
-      const psCmd = `Expand-Archive -Path "${tempFile}" -DestinationPath "${binDir}" -Force`;
-      execSync(psCmd, { shell: "powershell.exe", stdio: "inherit" });
-    } else {
-      // Unix: tar extract
-      execSync(`tar -xzf "${tempFile}" -C "${binDir}" --strip-components=1`, {
-        stdio: "inherit",
-      });
-    }
+    execSync(`tar -xzf "${tempFile}" -C "${binDir}" --strip-components=1`, {
+      stdio: "inherit",
+    });
 
     fs.unlinkSync(tempFile);
 
-    // Make binaries executable on Unix
-    if (process.platform !== "win32") {
-      fs.chmodSync(path.join(binDir, rewgetBin), 0o755);
-      fs.chmodSync(path.join(binDir, rewgetdBin), 0o755);
-    }
+    fs.chmodSync(path.join(binDir, rewgetBin), 0o755);
+    fs.chmodSync(path.join(binDir, rewgetdBin), 0o755);
 
     console.log("rewget installed successfully.");
   } catch (err) {

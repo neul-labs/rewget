@@ -7,7 +7,7 @@
 [![npm](https://img.shields.io/npm/v/rewget.svg)](https://www.npmjs.com/package/rewget)
 [![PyPI](https://img.shields.io/pypi/v/rewget.svg)](https://pypi.org/project/rewget/)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/neul-labs/rewget/ci.yml?branch=main)](https://github.com/neul-labs/rewget/actions)
-[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-lightgrey)](https://github.com/neul-labs/rewget/releases)
+[![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey)](https://github.com/neul-labs/rewget/releases)
 [![Docs](https://img.shields.io/badge/docs-docs.neullabs.com-blue)](https://docs.neullabs.com/rewget)
 
 A drop-in wget replacement that automatically bypasses bot protection. When sites block wget with 403s or CAPTCHAs, rewget seamlessly retries with browser-like TLS fingerprints and JavaScript rendering.
@@ -125,9 +125,6 @@ cargo install rewget
 ```bash
 # Linux/macOS
 curl -fsSL https://rewget.dev/install.sh | sh
-
-# Windows PowerShell
-irm https://rewget.dev/install.ps1 | iex
 ```
 
 ### Shell Completions
