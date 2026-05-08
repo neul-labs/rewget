@@ -88,66 +88,90 @@ impl Args {
                         "download-chromium" => command = Command::DownloadChromium,
                         "chromium-path" => command = Command::ChromiumPath,
                         "profile-url" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-profile-url requires a value"))?;
+                            let v = value
+                                .ok_or_else(|| anyhow!("--rewget-profile-url requires a value"))?;
                             profile_url = Some(v.to_string());
                         }
                         "no-verify" => profile_no_verify = true,
 
                         "engine" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-engine requires a value"))?;
+                            let v =
+                                value.ok_or_else(|| anyhow!("--rewget-engine requires a value"))?;
                             config.engine = Engine::from_str(v)?;
                         }
 
                         "fallback-codes" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-fallback-codes requires a value"))?;
+                            let v = value.ok_or_else(|| {
+                                anyhow!("--rewget-fallback-codes requires a value")
+                            })?;
                             config.fallback_codes = parse_codes(v)?;
                         }
 
                         "fallback-stage" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-fallback-stage requires a value"))?;
-                            let stage_num: u8 = v.parse().map_err(|_| anyhow!("Invalid stage: {}", v))?;
+                            let v = value.ok_or_else(|| {
+                                anyhow!("--rewget-fallback-stage requires a value")
+                            })?;
+                            let stage_num: u8 =
+                                v.parse().map_err(|_| anyhow!("Invalid stage: {}", v))?;
                             config.fallback_stage = FetchStage::try_from(stage_num)
                                 .map_err(|_| anyhow!("Stage must be 1, 2, or 3"))?;
                         }
 
                         "fallback-patterns" => {
-                            let _v = value.ok_or_else(|| anyhow!("--rewget-fallback-patterns requires a value"))?;
+                            let _v = value.ok_or_else(|| {
+                                anyhow!("--rewget-fallback-patterns requires a value")
+                            })?;
                             // TODO: Store custom patterns
                         }
 
                         "profile" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-profile requires a value"))?;
+                            let v = value
+                                .ok_or_else(|| anyhow!("--rewget-profile requires a value"))?;
                             config.profile = Some(v.to_string());
                         }
 
                         "daemon" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-daemon requires a value"))?;
-                            config.daemon_mode = DaemonMode::from_str(v)
-                                .ok_or_else(|| anyhow!("Invalid daemon mode: {}. Use auto, on, or off", v))?;
+                            let v =
+                                value.ok_or_else(|| anyhow!("--rewget-daemon requires a value"))?;
+                            config.daemon_mode = DaemonMode::from_str(v).ok_or_else(|| {
+                                anyhow!("Invalid daemon mode: {}. Use auto, on, or off", v)
+                            })?;
                         }
 
                         "timeout-stage1" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-timeout-stage1 requires a value"))?;
-                            config.timeout_stage1 = Some(v.parse().map_err(|_| anyhow!("Invalid timeout: {}", v))?);
+                            let v = value.ok_or_else(|| {
+                                anyhow!("--rewget-timeout-stage1 requires a value")
+                            })?;
+                            config.timeout_stage1 =
+                                Some(v.parse().map_err(|_| anyhow!("Invalid timeout: {}", v))?);
                         }
 
                         "timeout-stage2" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-timeout-stage2 requires a value"))?;
-                            config.timeout_stage2 = v.parse().map_err(|_| anyhow!("Invalid timeout: {}", v))?;
+                            let v = value.ok_or_else(|| {
+                                anyhow!("--rewget-timeout-stage2 requires a value")
+                            })?;
+                            config.timeout_stage2 =
+                                v.parse().map_err(|_| anyhow!("Invalid timeout: {}", v))?;
                         }
 
                         "timeout-stage3" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-timeout-stage3 requires a value"))?;
-                            config.timeout_stage3 = v.parse().map_err(|_| anyhow!("Invalid timeout: {}", v))?;
+                            let v = value.ok_or_else(|| {
+                                anyhow!("--rewget-timeout-stage3 requires a value")
+                            })?;
+                            config.timeout_stage3 =
+                                v.parse().map_err(|_| anyhow!("Invalid timeout: {}", v))?;
                         }
 
                         "js-wait" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-js-wait requires a value"))?;
+                            let v = value
+                                .ok_or_else(|| anyhow!("--rewget-js-wait requires a value"))?;
                             config.js_wait = Some(v.to_string());
                         }
 
                         "verify-profile" => {
-                            let v = value.ok_or_else(|| anyhow!("--rewget-verify-profile requires a value"))?;
+                            let v = value.ok_or_else(|| {
+                                anyhow!("--rewget-verify-profile requires a value")
+                            })?;
                             command = Command::VerifyProfile(v.to_string());
                         }
 
@@ -269,11 +293,7 @@ mod tests {
 
     #[test]
     fn test_parse_version() {
-        let args = Args::parse(vec![
-            "rewget".to_string(),
-            "--rewget-version".to_string(),
-        ])
-        .unwrap();
+        let args = Args::parse(vec!["rewget".to_string(), "--rewget-version".to_string()]).unwrap();
 
         assert!(matches!(args.command, Command::Version));
     }

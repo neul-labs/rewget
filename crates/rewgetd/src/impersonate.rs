@@ -2,9 +2,9 @@
 //!
 //! Provides TLS and HTTP/2 fingerprint impersonation to bypass bot detection.
 
+use rewget_core::{analyze_body, Request, Response};
 use rquest::Client;
 use rquest_util::Emulation;
-use rewget_core::{analyze_body, Request, Response};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
@@ -126,7 +126,12 @@ async fn fetch_async(request: Request) -> Response {
         "HEAD" => client.head(&request.url),
         "PUT" => client.put(&request.url),
         "DELETE" => client.delete(&request.url),
-        _ => return Response::error(request.id, &format!("Unsupported method: {}", request.method)),
+        _ => {
+            return Response::error(
+                request.id,
+                &format!("Unsupported method: {}", request.method),
+            )
+        }
     };
 
     // Add headers
@@ -150,7 +155,10 @@ async fn fetch_async(request: Request) -> Response {
         }
         Err(_) => {
             warn!("Request timeout after {:?}", timeout_duration);
-            return Response::error(request.id, &format!("Request timeout after {:?}", timeout_duration));
+            return Response::error(
+                request.id,
+                &format!("Request timeout after {:?}", timeout_duration),
+            );
         }
     };
 
@@ -171,8 +179,9 @@ async fn fetch_async(request: Request) -> Response {
     // Get the body (also with timeout for large responses)
     let body_result = tokio::time::timeout(
         Duration::from_secs(60), // Body read timeout
-        resp.bytes()
-    ).await;
+        resp.bytes(),
+    )
+    .await;
 
     let body_bytes = match body_result {
         Ok(Ok(b)) => b.to_vec(),
@@ -202,18 +211,19 @@ async fn fetch_async(request: Request) -> Response {
     // Write to file if output specified
     let bytes_written = if let Some(output_path) = &request.output {
         match File::create(output_path) {
-            Ok(mut file) => {
-                match file.write_all(&body_bytes) {
-                    Ok(_) => Some(body_bytes.len() as u64),
-                    Err(e) => {
-                        warn!("Failed to write output: {}", e);
-                        return Response::error(request.id, &format!("Failed to write output: {}", e));
-                    }
+            Ok(mut file) => match file.write_all(&body_bytes) {
+                Ok(_) => Some(body_bytes.len() as u64),
+                Err(e) => {
+                    warn!("Failed to write output: {}", e);
+                    return Response::error(request.id, &format!("Failed to write output: {}", e));
                 }
-            }
+            },
             Err(e) => {
                 warn!("Failed to create output file: {}", e);
-                return Response::error(request.id, &format!("Failed to create output file: {}", e));
+                return Response::error(
+                    request.id,
+                    &format!("Failed to create output file: {}", e),
+                );
             }
         }
     } else {
@@ -221,7 +231,11 @@ async fn fetch_async(request: Request) -> Response {
     };
 
     if blocked {
-        let mut resp = Response::blocked(request.id, status, block_reason.as_deref().unwrap_or("Unknown"));
+        let mut resp = Response::blocked(
+            request.id,
+            status,
+            block_reason.as_deref().unwrap_or("Unknown"),
+        );
         resp.headers = headers;
         if bytes_written.is_none() {
             resp.body = Some(body_bytes);

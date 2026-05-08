@@ -5,9 +5,9 @@
 
 use crate::Result;
 use base64::Engine;
-use ed25519_dalek::{Signature, VerifyingKey, Verifier};
+use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use serde::{Deserialize, Serialize};
-use sha2::{Sha256, Digest};
+use sha2::{Digest, Sha256};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
@@ -244,7 +244,8 @@ impl ProfileCollection {
             .call()
             .map_err(|e| crate::Error::Config(format!("Failed to fetch profiles: {}", e)))?;
 
-        let body = response.into_string()
+        let body = response
+            .into_string()
             .map_err(|e| crate::Error::Config(format!("Failed to read response: {}", e)))?;
 
         let collection: Self = serde_json::from_str(&body)?;
@@ -266,10 +267,12 @@ impl ProfileCollection {
         // Handle SPKI format (skip header if present) or raw 32-byte key
         let key_bytes: [u8; 32] = if public_key_bytes.len() == 44 {
             // SPKI format: skip 12-byte header
-            public_key_bytes[12..44].try_into()
+            public_key_bytes[12..44]
+                .try_into()
                 .map_err(|_| crate::Error::Config("Invalid public key length".to_string()))?
         } else if public_key_bytes.len() == 32 {
-            public_key_bytes.try_into()
+            public_key_bytes
+                .try_into()
                 .map_err(|_| crate::Error::Config("Invalid public key length".to_string()))?
         } else {
             return Err(crate::Error::Config(format!(
@@ -286,7 +289,8 @@ impl ProfileCollection {
             .decode(signature_b64)
             .map_err(|e| crate::Error::Config(format!("Invalid signature: {}", e)))?;
 
-        let signature_arr: [u8; 64] = signature_bytes.try_into()
+        let signature_arr: [u8; 64] = signature_bytes
+            .try_into()
             .map_err(|_| crate::Error::Config("Invalid signature length".to_string()))?;
 
         let signature = Signature::from_bytes(&signature_arr);
@@ -319,12 +323,12 @@ impl ProfileCollection {
         let remote = Self::fetch_remote(url)?;
 
         // Verify signature if required
-        if verify
-            && !remote.verify_signature(PROFILE_PUBLIC_KEY)? {
-                return Err(crate::Error::Config(
-                    "Profile signature verification failed. Use --rewget-no-verify to skip.".to_string()
-                ));
-            }
+        if verify && !remote.verify_signature(PROFILE_PUBLIC_KEY)? {
+            return Err(crate::Error::Config(
+                "Profile signature verification failed. Use --rewget-no-verify to skip."
+                    .to_string(),
+            ));
+        }
 
         // Load existing profiles
         let existing = Self::load();
@@ -338,7 +342,10 @@ impl ProfileCollection {
         let mut merged_profiles = existing.profiles.clone();
 
         for remote_profile in &remote.profiles {
-            if let Some(pos) = merged_profiles.iter().position(|p| p.name == remote_profile.name) {
+            if let Some(pos) = merged_profiles
+                .iter()
+                .position(|p| p.name == remote_profile.name)
+            {
                 // Existing profile - check if newer
                 if remote_profile.version > merged_profiles[pos].version {
                     merged_profiles[pos] = remote_profile.clone();
@@ -490,7 +497,10 @@ fn chrome130_profile() -> Profile {
     profile.description = "Chrome 130 on Windows 10".to_string();
     profile.browser.version = "130.0.0.0".to_string();
     profile.browser.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36".to_string();
-    profile.headers.insert("sec-ch-ua".to_string(), r#""Google Chrome";v="130", "Chromium";v="130", "Not_A Brand";v="24""#.to_string());
+    profile.headers.insert(
+        "sec-ch-ua".to_string(),
+        r#""Google Chrome";v="130", "Chromium";v="130", "Not_A Brand";v="24""#.to_string(),
+    );
     profile
 }
 
@@ -591,7 +601,9 @@ fn firefox133_profile() -> Profile {
     profile.name = "firefox133".to_string();
     profile.description = "Firefox 133 on Windows 10".to_string();
     profile.browser.version = "133.0".to_string();
-    profile.browser.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0".to_string();
+    profile.browser.user_agent =
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0"
+            .to_string();
     profile
 }
 
@@ -687,7 +699,10 @@ fn edge131_profile() -> Profile {
     profile.description = "Edge 131 on Windows 10".to_string();
     profile.browser.name = "Edge".to_string();
     profile.browser.user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0".to_string();
-    profile.headers.insert("sec-ch-ua".to_string(), r#""Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24""#.to_string());
+    profile.headers.insert(
+        "sec-ch-ua".to_string(),
+        r#""Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24""#.to_string(),
+    );
     profile
 }
 

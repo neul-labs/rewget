@@ -8,7 +8,9 @@
 
 use chromiumoxide::browser::{Browser, BrowserConfig};
 use futures::StreamExt;
-use rewget_core::{chromium_installed, chromium_path, download_chromium, Request, Response, CHROMIUM_VERSION};
+use rewget_core::{
+    chromium_installed, chromium_path, download_chromium, Request, Response, CHROMIUM_VERSION,
+};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
@@ -44,10 +46,17 @@ enum PreflightState {
     BrowserLaunching,
     PageCreated,
     Navigating,
-    WaitingForJs { condition: WaitCondition, start: Instant },
+    WaitingForJs {
+        condition: WaitCondition,
+        start: Instant,
+    },
     Extracting,
-    Complete { response: Response },
-    Failed { error: String },
+    Complete {
+        response: Response,
+    },
+    Failed {
+        error: String,
+    },
 }
 
 /// Session that drives a single Stage 3 preflight request.
@@ -68,8 +77,14 @@ impl PreflightSession {
     /// Returns `Some(Response)` if an error occurs, otherwise `None`.
     fn ensure_chromium(&mut self) -> Option<Response> {
         if !chromium_installed() {
-            info!("Chromium not installed, downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
-            eprintln!("[rewget] Downloading Chrome for Testing v{} (~150MB, one-time setup)...", CHROMIUM_VERSION);
+            info!(
+                "Chromium not installed, downloading Chrome for Testing v{}...",
+                CHROMIUM_VERSION
+            );
+            eprintln!(
+                "[rewget] Downloading Chrome for Testing v{} (~150MB, one-time setup)...",
+                CHROMIUM_VERSION
+            );
 
             if let Err(e) = download_chromium(|_downloaded, _total| {}) {
                 self.state = PreflightState::Failed {
@@ -120,7 +135,10 @@ impl PreflightSession {
                 self.state = PreflightState::Failed {
                     error: format!("Failed to configure browser: {}", e),
                 };
-                return Response::error(self.request.id, &format!("Failed to configure browser: {}", e));
+                return Response::error(
+                    self.request.id,
+                    &format!("Failed to configure browser: {}", e),
+                );
             }
         };
 
@@ -130,7 +148,10 @@ impl PreflightSession {
                 self.state = PreflightState::Failed {
                     error: format!("Failed to launch browser: {}", e),
                 };
-                return Response::error(self.request.id, &format!("Failed to launch browser: {}", e));
+                return Response::error(
+                    self.request.id,
+                    &format!("Failed to launch browser: {}", e),
+                );
             }
         };
 
@@ -168,7 +189,10 @@ impl PreflightSession {
         }
 
         // -- WaitingForJs --
-        let js_wait = self.request.js_wait.as_ref()
+        let js_wait = self
+            .request
+            .js_wait
+            .as_ref()
             .and_then(|s| parse_wait_condition(s))
             .unwrap_or(WaitCondition::Delay(DEFAULT_JS_WAIT_MS));
 
@@ -213,7 +237,11 @@ impl PreflightSession {
         // -- Extracting --
         self.state = PreflightState::Extracting;
 
-        let final_url = page.url().await.unwrap_or_else(|_| Some(self.request.url.clone())).unwrap_or(self.request.url.clone());
+        let final_url = page
+            .url()
+            .await
+            .unwrap_or_else(|_| Some(self.request.url.clone()))
+            .unwrap_or(self.request.url.clone());
         debug!("Final URL: {}", final_url);
 
         let content = match page.content().await {
@@ -248,14 +276,20 @@ impl PreflightSession {
                         self.state = PreflightState::Failed {
                             error: format!("Failed to write output: {}", e),
                         };
-                        return Response::error(self.request.id, &format!("Failed to write output: {}", e))
+                        return Response::error(
+                            self.request.id,
+                            &format!("Failed to write output: {}", e),
+                        );
                     }
                 },
                 Err(e) => {
                     self.state = PreflightState::Failed {
                         error: format!("Failed to create output: {}", e),
                     };
-                    return Response::error(self.request.id, &format!("Failed to create output: {}", e))
+                    return Response::error(
+                        self.request.id,
+                        &format!("Failed to create output: {}", e),
+                    );
                 }
             }
         } else {
@@ -284,7 +318,9 @@ impl PreflightSession {
                 resp.body = Some(body_bytes);
             }
             resp.bytes_written = bytes_written;
-            self.state = PreflightState::Complete { response: resp.clone() };
+            self.state = PreflightState::Complete {
+                response: resp.clone(),
+            };
             resp
         } else {
             let mut resp = Response::success(self.request.id, 200);
@@ -293,7 +329,9 @@ impl PreflightSession {
                 resp.body = Some(body_bytes);
             }
             resp.bytes_written = bytes_written;
-            self.state = PreflightState::Complete { response: resp.clone() };
+            self.state = PreflightState::Complete {
+                response: resp.clone(),
+            };
             resp
         }
     }

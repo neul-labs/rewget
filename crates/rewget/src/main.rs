@@ -15,11 +15,11 @@ use args::Args;
 use cli::generate_completions;
 
 fn main() -> Result<()> {
-        let mut args = Args::parse(std::env::args().collect())?;
+    let mut args = Args::parse(std::env::args().collect())?;
 
-        // Load config file and merge with CLI args (CLI takes precedence)
-        let config_file = rewget_core::ConfigFile::load();
-        config_file.merge_into(&mut args.config);
+    // Load config file and merge with CLI args (CLI takes precedence)
+    let config_file = rewget_core::ConfigFile::load();
+    config_file.merge_into(&mut args.config);
 
     match args.command {
         args::Command::Version => {
@@ -58,9 +58,7 @@ fn main() -> Result<()> {
             generate_completions(&shell)?;
             Ok(())
         }
-        args::Command::Run => {
-            exec::run(args.config, args.wget_args)
-        }
+        args::Command::Run => exec::run(args.config, args.wget_args),
     }
 }
 
@@ -175,9 +173,13 @@ fn list_profiles() -> Result<()> {
 
     for profile in &collection.profiles {
         println!("  {} - {}", profile.name, profile.description);
-        println!("    Browser: {} {}", profile.browser.name, profile.browser.version);
+        println!(
+            "    Browser: {} {}",
+            profile.browser.name, profile.browser.version
+        );
         println!("    Platform: {}", profile.browser.platform);
-        println!("    TLS: {} cipher suites, GREASE: {}",
+        println!(
+            "    TLS: {} cipher suites, GREASE: {}",
             profile.tls.cipher_suites.len(),
             if profile.tls.grease { "yes" } else { "no" }
         );
@@ -214,7 +216,10 @@ fn update_profiles(url: Option<&str>, no_verify: bool) -> Result<()> {
                 eprintln!("[rewget] Unchanged: {} profiles", result.unchanged);
             }
             eprintln!("[rewget] Total: {} profiles", result.total);
-            eprintln!("[rewget] Profiles saved to: {}", ProfileCollection::builtin_path().display());
+            eprintln!(
+                "[rewget] Profiles saved to: {}",
+                ProfileCollection::builtin_path().display()
+            );
             Ok(())
         }
         Err(e) => {
@@ -225,21 +230,32 @@ fn update_profiles(url: Option<&str>, no_verify: bool) -> Result<()> {
             let collection = ProfileCollection::default_profiles();
             collection.save_builtin()?;
 
-            eprintln!("[rewget] Reset to {} built-in profiles", collection.profiles.len());
+            eprintln!(
+                "[rewget] Reset to {} built-in profiles",
+                collection.profiles.len()
+            );
             Ok(())
         }
     }
 }
 
 fn download_chromium() -> Result<()> {
-    use rewget_core::{chromium_installed, chromium_path, download_chromium as do_download, CHROMIUM_VERSION};
+    use rewget_core::{
+        chromium_installed, chromium_path, download_chromium as do_download, CHROMIUM_VERSION,
+    };
 
     if chromium_installed() {
-        eprintln!("[rewget] Chromium already installed at: {}", chromium_path().display());
+        eprintln!(
+            "[rewget] Chromium already installed at: {}",
+            chromium_path().display()
+        );
         return Ok(());
     }
 
-    eprintln!("[rewget] Downloading Chrome for Testing v{}...", CHROMIUM_VERSION);
+    eprintln!(
+        "[rewget] Downloading Chrome for Testing v{}...",
+        CHROMIUM_VERSION
+    );
     eprintln!("[rewget] This is approximately 150MB and only needs to be done once.");
     eprintln!();
 
@@ -248,7 +264,10 @@ fn download_chromium() -> Result<()> {
     }) {
         Ok(_) => {
             eprintln!();
-            eprintln!("[rewget] Chromium installed at: {}", chromium_path().display());
+            eprintln!(
+                "[rewget] Chromium installed at: {}",
+                chromium_path().display()
+            );
             Ok(())
         }
         Err(e) => {
@@ -309,7 +328,14 @@ fn verify_profile(name: &str) -> Result<()> {
             println!("  Extensions: {} total", profile.tls.extensions.len());
             println!("  Curves: {}", profile.tls.curves.join(", "));
             println!("  ALPN: {}", profile.tls.alpn.join(", "));
-            println!("  GREASE: {}", if profile.tls.grease { "enabled" } else { "disabled" });
+            println!(
+                "  GREASE: {}",
+                if profile.tls.grease {
+                    "enabled"
+                } else {
+                    "disabled"
+                }
+            );
             println!();
 
             println!("HTTP/2 Settings:");
@@ -317,7 +343,10 @@ fn verify_profile(name: &str) -> Result<()> {
                 println!("  {}: {}", key, value);
             }
             println!("  Window Update: {}", profile.http2.window_update);
-            println!("  Pseudo-header Order: {}", profile.http2.pseudo_header_order.join(", "));
+            println!(
+                "  Pseudo-header Order: {}",
+                profile.http2.pseudo_header_order.join(", ")
+            );
             println!();
 
             println!("Default Headers: {}", profile.headers.len());

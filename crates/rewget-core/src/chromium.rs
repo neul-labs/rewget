@@ -174,7 +174,9 @@ where
             if status.success() {
                 Ok(())
             } else {
-                Err(crate::Error::Config("Failed to download Chromium".to_string()))
+                Err(crate::Error::Config(
+                    "Failed to download Chromium".to_string(),
+                ))
             }
         }
     }
@@ -210,7 +212,9 @@ where
         if status.success() {
             Ok(())
         } else {
-            Err(crate::Error::Config("Failed to download Chromium".to_string()))
+            Err(crate::Error::Config(
+                "Failed to download Chromium".to_string(),
+            ))
         }
     }
 }
@@ -229,7 +233,9 @@ fn extract_zip(zip_path: &PathBuf, dest_dir: &PathBuf) -> Result<()> {
     if status.success() {
         Ok(())
     } else {
-        Err(crate::Error::Config("Failed to extract Chromium".to_string()))
+        Err(crate::Error::Config(
+            "Failed to extract Chromium".to_string(),
+        ))
     }
 }
 
@@ -249,7 +255,9 @@ fn extract_zip(zip_path: &PathBuf, dest_dir: &PathBuf) -> Result<()> {
     if status.success() {
         Ok(())
     } else {
-        Err(crate::Error::Config("Failed to extract Chromium".to_string()))
+        Err(crate::Error::Config(
+            "Failed to extract Chromium".to_string(),
+        ))
     }
 }
 

@@ -255,9 +255,7 @@ pub fn should_analyze_body(content_type: Option<&str>, content_length: Option<us
         .map(|ct| ct.contains("text/html"))
         .unwrap_or(false);
 
-    let is_small = content_length
-        .map(|len| len < 100 * 1024)
-        .unwrap_or(true); // If unknown, analyze anyway
+    let is_small = content_length.map(|len| len < 100 * 1024).unwrap_or(true); // If unknown, analyze anyway
 
     is_html && is_small
 }
@@ -307,7 +305,8 @@ HTTP request sent, awaiting response... 503 Service Unavailable
 
     #[test]
     fn test_analyze_body_cloudflare() {
-        let body = r#"<html><body>Just a moment...<script>cf-browser-verification</script></body></html>"#;
+        let body =
+            r#"<html><body>Just a moment...<script>cf-browser-verification</script></body></html>"#;
         let result = analyze_body(body, &[]);
         assert!(result.is_some());
     }
@@ -333,10 +332,7 @@ HTTP request sent, awaiting response... 503 Service Unavailable
 
     #[test]
     fn test_block_reason_display() {
-        assert_eq!(
-            format!("{}", BlockReason::StatusCode(403)),
-            "403 Forbidden"
-        );
+        assert_eq!(format!("{}", BlockReason::StatusCode(403)), "403 Forbidden");
         assert_eq!(
             format!("{}", BlockReason::BodyPattern("test".to_string())),
             "Challenge page detected (test)"

@@ -19,8 +19,12 @@ pub fn is_running() -> bool {
 fn ping() -> Result<()> {
     let socket = connect()?;
     let msg = Message::from(b"status".as_slice());
-    socket.send(msg).map_err(|(_, e)| anyhow::anyhow!("Send failed: {}", e))?;
-    socket.recv().map_err(|e| anyhow::anyhow!("Recv failed: {}", e))?;
+    socket
+        .send(msg)
+        .map_err(|(_, e)| anyhow::anyhow!("Send failed: {}", e))?;
+    socket
+        .recv()
+        .map_err(|e| anyhow::anyhow!("Recv failed: {}", e))?;
     Ok(())
 }
 
@@ -29,14 +33,15 @@ fn connect() -> Result<Socket> {
     let socket_path = socket_path();
     let socket_url = format!("ipc://{}", socket_path.display());
 
-    let socket = Socket::new(Protocol::Req0)
-        .context("Failed to create nng socket")?;
+    let socket = Socket::new(Protocol::Req0).context("Failed to create nng socket")?;
 
     // Set receive timeout
-    socket.set_opt::<nng::options::RecvTimeout>(Some(Duration::from_secs(30)))
+    socket
+        .set_opt::<nng::options::RecvTimeout>(Some(Duration::from_secs(30)))
         .context("Failed to set recv timeout")?;
 
-    socket.dial(&socket_url)
+    socket
+        .dial(&socket_url)
         .context(format!("Failed to connect to {}", socket_url))?;
 
     Ok(socket)
@@ -46,18 +51,17 @@ fn connect() -> Result<Socket> {
 pub fn send_request(request: &Request) -> Result<Response> {
     let socket = connect()?;
 
-    let request_bytes = serde_json::to_vec(request)
-        .context("Failed to serialize request")?;
+    let request_bytes = serde_json::to_vec(request).context("Failed to serialize request")?;
 
     let msg = Message::from(request_bytes.as_slice());
-    socket.send(msg)
+    socket
+        .send(msg)
         .map_err(|(_, e)| anyhow::anyhow!("Failed to send request: {}", e))?;
 
-    let response_bytes = socket.recv()
-        .context("Failed to receive response")?;
+    let response_bytes = socket.recv().context("Failed to receive response")?;
 
-    let response: Response = serde_json::from_slice(&response_bytes)
-        .context("Failed to deserialize response")?;
+    let response: Response =
+        serde_json::from_slice(&response_bytes).context("Failed to deserialize response")?;
 
     Ok(response)
 }

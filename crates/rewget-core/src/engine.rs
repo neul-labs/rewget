@@ -1,7 +1,7 @@
 //! Wget engine selection and execution
 
-use std::path::PathBuf;
 use crate::{Error, Result};
+use std::path::PathBuf;
 
 /// Supported wget engines
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]

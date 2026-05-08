@@ -6,8 +6,8 @@
 
 use anyhow::{Context, Result};
 use rewget_core::{
-    analyze_body, analyze_exit_code, extract_domain, Config, DaemonMode,
-    DetectionResult, DomainCache, FetchAction, FetchOrchestrator,
+    analyze_body, analyze_exit_code, extract_domain, Config, DaemonMode, DetectionResult,
+    DomainCache, FetchAction, FetchOrchestrator,
 };
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
@@ -72,9 +72,16 @@ fn run_with_fallback(
     };
 
     if config.debug {
-        eprintln!("[rewget] Engine: {} ({})", config.engine, engine_path.display());
+        eprintln!(
+            "[rewget] Engine: {} ({})",
+            config.engine,
+            engine_path.display()
+        );
         eprintln!("[rewget] Args: {:?}", wget_args);
-        eprintln!("[rewget] Fallback: enabled (max Stage {})", config.fallback_stage.number());
+        eprintln!(
+            "[rewget] Fallback: enabled (max Stage {})",
+            config.fallback_stage.number()
+        );
         if let Some(d) = &domain {
             eprintln!("[rewget] Domain: {}", d);
         }
@@ -136,7 +143,11 @@ fn run_with_fallback(
 
             FetchAction::RunImpersonate { stage, .. } => {
                 if config.debug {
-                    eprintln!("[rewget] Falling back to Stage {} ({})...", stage.number(), stage);
+                    eprintln!(
+                        "[rewget] Falling back to Stage {} ({})...",
+                        stage.number(),
+                        stage
+                    );
                 }
 
                 if let Some(ref url) = url {
@@ -165,7 +176,11 @@ fn run_with_fallback(
 
             FetchAction::RunPreflight { stage, .. } => {
                 if config.debug {
-                    eprintln!("[rewget] Falling back to Stage {} ({})...", stage.number(), stage);
+                    eprintln!(
+                        "[rewget] Falling back to Stage {} ({})...",
+                        stage.number(),
+                        stage
+                    );
                 }
 
                 if let Some(ref url) = url {
@@ -326,9 +341,9 @@ fn run_stage2(
     } else if response.blocked {
         Ok((false, true, response.status_code, response.block_reason))
     } else {
-        Err(anyhow::anyhow!(
-            response.error.unwrap_or_else(|| "Stage 2 failed".to_string())
-        ))
+        Err(anyhow::anyhow!(response
+            .error
+            .unwrap_or_else(|| "Stage 2 failed".to_string())))
     }
 }
 
@@ -381,9 +396,9 @@ fn run_stage3(
     } else if response.blocked {
         Ok((false, true, response.status_code, response.block_reason))
     } else {
-        Err(anyhow::anyhow!(
-            response.error.unwrap_or_else(|| "Stage 3 failed".to_string())
-        ))
+        Err(anyhow::anyhow!(response
+            .error
+            .unwrap_or_else(|| "Stage 3 failed".to_string())))
     }
 }
 
@@ -470,10 +485,7 @@ mod tests {
     #[test]
     fn test_find_url_in_args_www() {
         let args = vec!["www.example.com".to_string()];
-        assert_eq!(
-            find_url_in_args(&args),
-            Some("www.example.com".to_string())
-        );
+        assert_eq!(find_url_in_args(&args), Some("www.example.com".to_string()));
     }
 
     #[test]

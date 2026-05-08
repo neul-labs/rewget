@@ -5,8 +5,9 @@
 use serde::{Deserialize, Serialize};
 
 /// A stage in the fetch fallback pipeline.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
-#[derive(Default)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default,
+)]
 pub enum FetchStage {
     /// Stage 1: Plain wget / wget2
     #[serde(rename = "wget")]
@@ -69,7 +70,6 @@ impl std::fmt::Display for FetchStage {
         }
     }
 }
-
 
 impl TryFrom<u8> for FetchStage {
     type Error = &'static str;

@@ -12,9 +12,7 @@ pub enum FetchState {
     Idle,
 
     /// Running a stage (wget, impersonate, or preflight).
-    RunningStage {
-        stage: FetchStage,
-    },
+    RunningStage { stage: FetchStage },
 
     /// Stage completed; analyzing detection result.
     Detecting {
@@ -23,14 +21,10 @@ pub enum FetchState {
     },
 
     /// Skipping lower stages because the cache says this one works.
-    CachedSkip {
-        stage: FetchStage,
-    },
+    CachedSkip { stage: FetchStage },
 
     /// Fetch succeeded at the given stage.
-    Success {
-        stage: FetchStage,
-    },
+    Success { stage: FetchStage },
 
     /// Fetch was blocked at the given stage.
     Blocked {
@@ -39,19 +33,13 @@ pub enum FetchState {
     },
 
     /// All stages exhausted; request is still blocked.
-    Exhausted {
-        last_reason: Option<BlockReason>,
-    },
+    Exhausted { last_reason: Option<BlockReason> },
 
     /// A terminal error occurred.
-    Error {
-        error: String,
-    },
+    Error { error: String },
 
     /// Fetch completed without success (e.g. wget exit code != 0 but not blocked).
-    Failed {
-        exit_code: i32,
-    },
+    Failed { exit_code: i32 },
 }
 
 /// Output produced by executing a single stage.
@@ -66,9 +54,7 @@ pub struct StageOutput {
 #[derive(Debug)]
 pub enum FetchAction {
     /// Run plain wget.
-    RunWget {
-        stage: FetchStage,
-    },
+    RunWget { stage: FetchStage },
 
     /// Run Stage 2 via daemon.
     RunImpersonate {
@@ -85,29 +71,19 @@ pub enum FetchAction {
     },
 
     /// Cache hit; skip directly to this stage.
-    CacheHit {
-        stage: FetchStage,
-    },
+    CacheHit { stage: FetchStage },
 
     /// Terminal success.
-    Complete {
-        stage: FetchStage,
-    },
+    Complete { stage: FetchStage },
 
     /// Terminal failure (all stages exhausted).
-    GiveUp {
-        last_reason: Option<BlockReason>,
-    },
+    GiveUp { last_reason: Option<BlockReason> },
 
     /// Terminal error.
-    Fatal {
-        error: String,
-    },
+    Fatal { error: String },
 
     /// Non-blocked failure (propagate wget exit code).
-    Propagate {
-        exit_code: i32,
-    },
+    Propagate { exit_code: i32 },
 }
 
 /// Orchestrates the fallback pipeline.
@@ -159,7 +135,9 @@ impl FetchOrchestrator {
                     if !self.config.no_cache {
                         if let Some(cached_stage) = self.cache.get(d) {
                             if cached_stage <= self.config.fallback_stage {
-                                self.state = CachedSkip { stage: cached_stage };
+                                self.state = CachedSkip {
+                                    stage: cached_stage,
+                                };
                                 return Some(FetchAction::CacheHit {
                                     stage: cached_stage,
                                 });
@@ -228,13 +206,12 @@ impl FetchOrchestrator {
                 self.state = Exhausted {
                     last_reason: Some(reason.clone()),
                 };
-                Some(FetchAction::GiveUp { last_reason: Some(reason) })
+                Some(FetchAction::GiveUp {
+                    last_reason: Some(reason),
+                })
             }
 
-            Success { .. }
-            | Exhausted { .. }
-            | Error { .. }
-            | Failed { .. } => {
+            Success { .. } | Exhausted { .. } | Error { .. } | Failed { .. } => {
                 self.state = state; // Restore terminal state.
                 None
             }
@@ -242,7 +219,12 @@ impl FetchOrchestrator {
     }
 
     /// Report the result of running Stage 1 (wget).
-    pub fn report_stage1(&mut self, exit_code: i32, detection: DetectionResult, body: Option<Vec<u8>>) {
+    pub fn report_stage1(
+        &mut self,
+        exit_code: i32,
+        detection: DetectionResult,
+        body: Option<Vec<u8>>,
+    ) {
         self.state = FetchState::Detecting {
             stage: FetchStage::Wget,
             result: StageOutput {
@@ -254,7 +236,13 @@ impl FetchOrchestrator {
     }
 
     /// Report the result of running Stage 2 (impersonate) via daemon.
-    pub fn report_stage2(&mut self, success: bool, blocked: bool, status_code: Option<u16>, reason: Option<String>) {
+    pub fn report_stage2(
+        &mut self,
+        success: bool,
+        blocked: bool,
+        status_code: Option<u16>,
+        reason: Option<String>,
+    ) {
         let detection = DetectionResult {
             blocked,
             status_code,
@@ -272,7 +260,13 @@ impl FetchOrchestrator {
     }
 
     /// Report the result of running Stage 3 (preflight) via daemon.
-    pub fn report_stage3(&mut self, success: bool, blocked: bool, status_code: Option<u16>, reason: Option<String>) {
+    pub fn report_stage3(
+        &mut self,
+        success: bool,
+        blocked: bool,
+        status_code: Option<u16>,
+        reason: Option<String>,
+    ) {
         let detection = DetectionResult {
             blocked,
             status_code,
@@ -294,9 +288,7 @@ impl FetchOrchestrator {
         self.state = FetchState::Error { error };
     }
 
-    fn action_for_stage(&self,
-        stage: FetchStage,
-    ) -> FetchAction {
+    fn action_for_stage(&self, stage: FetchStage) -> FetchAction {
         match stage {
             FetchStage::Wget => FetchAction::RunWget { stage },
             FetchStage::Impersonate => {
@@ -332,47 +324,75 @@ mod tests {
     fn test_idle_to_wget() {
         let mut orch = FetchOrchestrator::new(test_config(), DomainCache::default(), None);
         let action = orch.next_action().unwrap();
-        assert!(matches!(action, FetchAction::RunWget { stage: FetchStage::Wget }));
+        assert!(matches!(
+            action,
+            FetchAction::RunWget {
+                stage: FetchStage::Wget
+            }
+        ));
     }
 
     #[test]
     fn test_wget_success() {
         let mut orch = FetchOrchestrator::new(test_config(), DomainCache::default(), None);
         let _ = orch.next_action();
-        orch.report_stage1(0, DetectionResult {
-            blocked: false,
-            status_code: Some(200),
-            reason: None,
-            exit_code: 0,
-        }, None);
+        orch.report_stage1(
+            0,
+            DetectionResult {
+                blocked: false,
+                status_code: Some(200),
+                reason: None,
+                exit_code: 0,
+            },
+            None,
+        );
         let action = orch.next_action().unwrap();
-        assert!(matches!(action, FetchAction::Complete { stage: FetchStage::Wget }));
+        assert!(matches!(
+            action,
+            FetchAction::Complete {
+                stage: FetchStage::Wget
+            }
+        ));
     }
 
     #[test]
     fn test_wget_blocked_falls_back() {
         let mut orch = FetchOrchestrator::new(test_config(), DomainCache::default(), None);
         let _ = orch.next_action();
-        orch.report_stage1(8, DetectionResult {
-            blocked: true,
-            status_code: Some(403),
-            reason: Some(BlockReason::StatusCode(403)),
-            exit_code: 8,
-        }, None);
+        orch.report_stage1(
+            8,
+            DetectionResult {
+                blocked: true,
+                status_code: Some(403),
+                reason: Some(BlockReason::StatusCode(403)),
+                exit_code: 8,
+            },
+            None,
+        );
         let action = orch.next_action().unwrap();
-        assert!(matches!(action, FetchAction::RunImpersonate { stage: FetchStage::Impersonate, .. }));
+        assert!(matches!(
+            action,
+            FetchAction::RunImpersonate {
+                stage: FetchStage::Impersonate,
+                ..
+            }
+        ));
     }
 
     #[test]
     fn test_all_stages_exhausted() {
         let mut orch = FetchOrchestrator::new(test_config(), DomainCache::default(), None);
         let _ = orch.next_action(); // Idle -> Wget
-        orch.report_stage1(8, DetectionResult {
-            blocked: true,
-            status_code: Some(403),
-            reason: Some(BlockReason::StatusCode(403)),
-            exit_code: 8,
-        }, None);
+        orch.report_stage1(
+            8,
+            DetectionResult {
+                blocked: true,
+                status_code: Some(403),
+                reason: Some(BlockReason::StatusCode(403)),
+                exit_code: 8,
+            },
+            None,
+        );
         let _ = orch.next_action(); // Blocked -> Impersonate
         orch.report_stage2(false, true, Some(403), Some("Blocked".to_string()));
         let _ = orch.next_action(); // Blocked -> Preflight
@@ -386,13 +406,15 @@ mod tests {
         let mut cache = DomainCache::default();
         cache.set("example.com", FetchStage::Impersonate);
 
-        let mut orch = FetchOrchestrator::new(
-            test_config(),
-            cache,
-            Some("example.com".to_string()),
-        );
+        let mut orch =
+            FetchOrchestrator::new(test_config(), cache, Some("example.com".to_string()));
         let action = orch.next_action().unwrap();
-        assert!(matches!(action, FetchAction::CacheHit { stage: FetchStage::Impersonate }));
+        assert!(matches!(
+            action,
+            FetchAction::CacheHit {
+                stage: FetchStage::Impersonate
+            }
+        ));
     }
 
     #[test]
@@ -402,12 +424,16 @@ mod tests {
 
         let mut orch = FetchOrchestrator::new(config, DomainCache::default(), None);
         let _ = orch.next_action(); // Wget
-        orch.report_stage1(8, DetectionResult {
-            blocked: true,
-            status_code: Some(403),
-            reason: Some(BlockReason::StatusCode(403)),
-            exit_code: 8,
-        }, None);
+        orch.report_stage1(
+            8,
+            DetectionResult {
+                blocked: true,
+                status_code: Some(403),
+                reason: Some(BlockReason::StatusCode(403)),
+                exit_code: 8,
+            },
+            None,
+        );
         let _ = orch.next_action(); // Impersonate
         orch.report_stage2(false, true, Some(403), Some("Blocked".to_string()));
         let action = orch.next_action().unwrap();

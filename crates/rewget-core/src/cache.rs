@@ -130,10 +130,7 @@ pub fn extract_domain(url: &str) -> Option<String> {
     };
 
     // Parse the URL to extract host
-    let without_scheme = url
-        .split("://")
-        .nth(1)
-        .unwrap_or(&url);
+    let without_scheme = url.split("://").nth(1).unwrap_or(&url);
 
     // Get the host part (before any path, query, or port)
     let host = without_scheme

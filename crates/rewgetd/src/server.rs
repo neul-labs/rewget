@@ -3,7 +3,7 @@
 use anyhow::{Context, Result};
 use nng::options::Options;
 use nng::{Protocol, Socket};
-use rewget_core::{socket_path, FetchStage, Request, Response, DaemonStatus};
+use rewget_core::{socket_path, DaemonStatus, FetchStage, Request, Response};
 use std::fs;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
@@ -40,18 +40,22 @@ pub fn run(runtime: Arc<Runtime>) -> Result<()> {
     }
 
     // Create the rep0 (reply) socket
-    let socket = Socket::new(Protocol::Rep0)
-        .context("Failed to create nng socket")?;
+    let socket = Socket::new(Protocol::Rep0).context("Failed to create nng socket")?;
 
     // Set receive timeout for idle detection
     let idle_timeout = get_idle_timeout();
-    socket.set_opt::<nng::options::RecvTimeout>(Some(idle_timeout))
+    socket
+        .set_opt::<nng::options::RecvTimeout>(Some(idle_timeout))
         .context("Failed to set recv timeout")?;
 
-    socket.listen(&socket_url)
+    socket
+        .listen(&socket_url)
         .context(format!("Failed to listen on {}", socket_url))?;
 
-    info!("Listening on {} (idle timeout: {:?})", socket_url, idle_timeout);
+    info!(
+        "Listening on {} (idle timeout: {:?})",
+        socket_url, idle_timeout
+    );
 
     // Track last activity for graceful shutdown
     let mut last_activity = Instant::now();
@@ -62,11 +66,10 @@ pub fn run(runtime: Arc<Runtime>) -> Result<()> {
             Ok(msg) => {
                 last_activity = Instant::now();
                 let response = handle_message(&msg, &runtime);
-                let response_bytes = serde_json::to_vec(&response)
-                    .unwrap_or_else(|e| {
-                        error!("Failed to serialize response: {}", e);
-                        b"{}".to_vec()
-                    });
+                let response_bytes = serde_json::to_vec(&response).unwrap_or_else(|e| {
+                    error!("Failed to serialize response: {}", e);
+                    b"{}".to_vec()
+                });
 
                 if let Err((_, e)) = socket.send(&response_bytes) {
                     error!("Failed to send response: {}", e);
@@ -122,7 +125,10 @@ fn handle_request(request: Request, runtime: &Arc<Runtime>) -> Response {
     match request.stage {
         FetchStage::Impersonate => impersonate::fetch(request, runtime),
         FetchStage::Preflight => crate::preflight::fetch(request, runtime),
-        FetchStage::Wget => Response::error(request.id, "Stage 1 (wget) should not be requested from daemon"),
+        FetchStage::Wget => Response::error(
+            request.id,
+            "Stage 1 (wget) should not be requested from daemon",
+        ),
     }
 }
 

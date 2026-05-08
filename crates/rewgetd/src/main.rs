@@ -9,9 +9,9 @@ use mimalloc::MiMalloc;
 #[global_allocator]
 static GLOBAL: MiMalloc = MiMalloc;
 
-mod server;
 mod impersonate;
 mod preflight;
+mod server;
 
 use anyhow::Result;
 use std::sync::Arc;

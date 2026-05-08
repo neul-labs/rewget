@@ -51,7 +51,9 @@ impl Default for Config {
         Self {
             engine: Engine::default(),
             no_fallback: false,
-            fallback_codes: vec![403, 429, 503, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529],
+            fallback_codes: vec![
+                403, 429, 503, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529,
+            ],
             body_detection: true,
             quiet: false,
             debug: false,
@@ -158,11 +160,23 @@ impl Default for ProfileConfig {
     }
 }
 
-fn default_true() -> bool { true }
-fn default_fallback_codes() -> Vec<u16> { vec![403, 429, 503, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529] }
-fn default_idle_timeout() -> u64 { 300 }
-fn default_browser_pool_size() -> u8 { 2 }
-fn default_profile() -> String { "chrome".to_string() }
+fn default_true() -> bool {
+    true
+}
+fn default_fallback_codes() -> Vec<u16> {
+    vec![
+        403, 429, 503, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529,
+    ]
+}
+fn default_idle_timeout() -> u64 {
+    300
+}
+fn default_browser_pool_size() -> u8 {
+    2
+}
+fn default_profile() -> String {
+    "chrome".to_string()
+}
 
 impl ConfigFile {
     /// Get config directory path
@@ -178,12 +192,10 @@ impl ConfigFile {
     /// Load config from disk, or return default if not found.
     pub fn load() -> Self {
         match Self::config_path() {
-            Some(path) if path.exists() => {
-                match std::fs::read_to_string(&path) {
-                    Ok(content) => toml::from_str(&content).unwrap_or_default(),
-                    Err(_) => Self::default(),
-                }
-            }
+            Some(path) if path.exists() => match std::fs::read_to_string(&path) {
+                Ok(content) => toml::from_str(&content).unwrap_or_default(),
+                Err(_) => Self::default(),
+            },
             _ => Self::default(),
         }
     }
