@@ -259,47 +259,47 @@ jobs:
             esac
           done
 
-          cat > Formula/rewget.rb <<EOF
-          class Rewget < Formula
-            desc "wget-compatible wrapper with automatic fallback"
-            homepage "https://github.com/neul-labs/rewget"
-            version "${VERSION}"
-            license "MIT"
+          cat > Formula/rewget.rb <<'EOF'
+class Rewget < Formula
+  desc "wget-compatible wrapper with automatic fallback"
+  homepage "https://github.com/neul-labs/rewget"
+  version "${VERSION}"
+  license "MIT"
 
-            on_macos do
-              if Hardware::CPU.intel?
-                url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-macos-x64.tar.gz"
-                sha256 "${SHA_MACOS_X64}"
-              else
-                url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-macos-arm64.tar.gz"
-                sha256 "${SHA_MACOS_ARM64}"
-              end
-            end
+  on_macos do
+    if Hardware::CPU.intel?
+      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-macos-x64.tar.gz"
+      sha256 "${SHA_MACOS_X64}"
+    else
+      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-macos-arm64.tar.gz"
+      sha256 "${SHA_MACOS_ARM64}"
+    end
+  end
 
-            on_linux do
-              if Hardware::CPU.intel?
-                url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-linux-x64.tar.gz"
-                sha256 "${SHA_LINUX_X64}"
-              else
-                url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-linux-arm64.tar.gz"
-                sha256 "${SHA_LINUX_ARM64}"
-              end
-            end
+  on_linux do
+    if Hardware::CPU.intel?
+      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-linux-x64.tar.gz"
+      sha256 "${SHA_LINUX_X64}"
+    else
+      url "https://github.com/neul-labs/rewget/releases/download/v${VERSION}/rewget-linux-arm64.tar.gz"
+      sha256 "${SHA_LINUX_ARM64}"
+    end
+  end
 
-            depends_on "wget"
+  depends_on "wget"
 
-            def install
-              bin.install "rewget"
-              bin.install "rewgetd"
-              generate_completions_from_executable(bin/"rewget", "--rewget-completions")
-              man1.install "rewget.1" if File.exist?("rewget.1")
-            end
+  def install
+    bin.install "rewget"
+    bin.install "rewgetd"
+    generate_completions_from_executable(bin/"rewget", "--rewget-completions")
+    man1.install "rewget.1" if File.exist?("rewget.1")
+  end
 
-            test do
-              assert_match "rewget #{version}", shell_output("#{bin}/rewget --rewget-version")
-            end
-          end
-          EOF
+  test do
+    assert_match "rewget #{version}", shell_output("#{bin}/rewget --rewget-version")
+  end
+end
+EOF
 
       - name: Commit and push formula update
         working-directory: homebrew-tap
