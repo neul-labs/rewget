@@ -96,17 +96,27 @@ Results are cached per-domain (7-day TTL), so subsequent requests skip straight 
 
 ### Package Managers
 
+**Homebrew** (macOS / Linux)
+
 ```bash
-# Homebrew (macOS / Linux)
 brew install neul-labs/tap/rewget
+```
 
-# npm (all platforms)
+**npm** (all platforms)
+
+```bash
 npm install -g rewget
+```
 
-# PyPI (all platforms)
+**PyPI** (all platforms)
+
+```bash
 pip install rewget
+```
 
-# Cargo (from source)
+**Cargo** (from source)
+
+```bash
 cargo install rewget
 ```
 
