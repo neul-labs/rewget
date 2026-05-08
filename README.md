@@ -4,6 +4,8 @@
 
 [![License](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/rewget.svg)](https://crates.io/crates/rewget)
+[![npm](https://img.shields.io/npm/v/rewget.svg)](https://www.npmjs.com/package/rewget)
+[![PyPI](https://img.shields.io/pypi/v/rewget.svg)](https://pypi.org/project/rewget/)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/neul-labs/rewget/ci.yml?branch=main)](https://github.com/neul-labs/rewget/actions)
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos%20%7C%20windows-lightgrey)](https://github.com/neul-labs/rewget/releases)
 [![Docs](https://img.shields.io/badge/docs-docs.neullabs.com-blue)](https://docs.neullabs.com/rewget)
