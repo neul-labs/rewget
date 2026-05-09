@@ -78,13 +78,18 @@ pub enum DaemonMode {
     Off,
 }
 
-impl DaemonMode {
-    pub fn from_str(s: &str) -> Option<Self> {
+impl std::str::FromStr for DaemonMode {
+    type Err = String;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s.to_lowercase().as_str() {
-            "auto" => Some(DaemonMode::Auto),
-            "on" => Some(DaemonMode::On),
-            "off" => Some(DaemonMode::Off),
-            _ => None,
+            "auto" => Ok(DaemonMode::Auto),
+            "on" => Ok(DaemonMode::On),
+            "off" => Ok(DaemonMode::Off),
+            _ => Err(format!(
+                "Unknown daemon mode '{}'. Valid options: auto, on, off",
+                s
+            )),
         }
     }
 }

@@ -11,9 +11,10 @@ pub enum Engine {
     Wget2,
 }
 
-impl Engine {
-    /// Parse engine from string
-    pub fn from_str(s: &str) -> Result<Self> {
+impl std::str::FromStr for Engine {
+    type Err = Error;
+
+    fn from_str(s: &str) -> Result<Self> {
         match s.to_lowercase().as_str() {
             "wget" => Ok(Engine::Wget),
             "wget2" => Ok(Engine::Wget2),
@@ -23,7 +24,9 @@ impl Engine {
             ))),
         }
     }
+}
 
+impl Engine {
     /// Get the binary name for this engine
     pub fn binary_name(&self) -> &'static str {
         match self {
@@ -78,10 +81,10 @@ mod tests {
 
     #[test]
     fn test_engine_from_str() {
-        assert_eq!(Engine::from_str("wget").unwrap(), Engine::Wget);
-        assert_eq!(Engine::from_str("wget2").unwrap(), Engine::Wget2);
-        assert_eq!(Engine::from_str("WGET").unwrap(), Engine::Wget);
-        assert!(Engine::from_str("curl").is_err());
+        assert_eq!("wget".parse::<Engine>().unwrap(), Engine::Wget);
+        assert_eq!("wget2".parse::<Engine>().unwrap(), Engine::Wget2);
+        assert_eq!("WGET".parse::<Engine>().unwrap(), Engine::Wget);
+        assert!("curl".parse::<Engine>().is_err());
     }
 
     #[test]

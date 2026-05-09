@@ -60,7 +60,7 @@ impl Args {
 
         // Check environment for engine
         if let Ok(engine_str) = std::env::var("RWGET_ENGINE") {
-            config.engine = Engine::from_str(&engine_str)?;
+            config.engine = engine_str.parse::<Engine>()?;
         }
 
         // Skip program name
@@ -97,7 +97,7 @@ impl Args {
                         "engine" => {
                             let v =
                                 value.ok_or_else(|| anyhow!("--rewget-engine requires a value"))?;
-                            config.engine = Engine::from_str(v)?;
+                            config.engine = v.parse::<Engine>()?;
                         }
 
                         "fallback-codes" => {
@@ -133,7 +133,7 @@ impl Args {
                         "daemon" => {
                             let v =
                                 value.ok_or_else(|| anyhow!("--rewget-daemon requires a value"))?;
-                            config.daemon_mode = DaemonMode::from_str(v).ok_or_else(|| {
+                            config.daemon_mode = v.parse::<DaemonMode>().map_err(|_| {
                                 anyhow!("Invalid daemon mode: {}. Use auto, on, or off", v)
                             })?;
                         }
