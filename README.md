@@ -21,10 +21,7 @@ A drop-in wget replacement that automatically bypasses bot protection. When site
 brew install neul-labs/tap/rewget
 
 # Or use the install script
-curl -fsSL https://rewget.dev/install.sh | sh
-
-# Windows (PowerShell)
-irm https://rewget.dev/install.ps1 | iex
+curl -fsSL https://raw.githubusercontent.com/neul-labs/rewget/main/scripts/install.sh | sh
 ```
 
 Use it exactly like wget:
@@ -102,15 +99,19 @@ Results are cached per-domain (7-day TTL), so subsequent requests skip straight 
 brew install neul-labs/tap/rewget
 ```
 
-**npm** (all platforms)
+**npm** (macOS / Linux)
 
 ```bash
 npm install -g rewget
 ```
 
-**PyPI** (all platforms)
+**PyPI** (macOS / Linux)
 
 ```bash
+# With uv
+uv tool install rewget
+
+# Or with pip
 pip install rewget
 ```
 
@@ -124,7 +125,7 @@ cargo install rewget
 
 ```bash
 # Linux/macOS
-curl -fsSL https://rewget.dev/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/neul-labs/rewget/main/scripts/install.sh | sh
 ```
 
 ### Shell Completions
