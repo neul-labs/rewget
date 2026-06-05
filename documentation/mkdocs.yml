@@ -2,10 +2,11 @@ site_name: rewget
 docs_dir: docs
 site_description: wget-compatible wrapper with automatic fallback for blocked requests
 site_author: Neul Labs
-site_url: https://docs.neullabs.com/rewget
+site_url: https://rewget.docs.neullabs.com/
 
 repo_name: neul-labs/rewget
 repo_url: https://github.com/neul-labs/rewget
+edit_uri: edit/main/documentation/docs/
 
 theme:
   name: material

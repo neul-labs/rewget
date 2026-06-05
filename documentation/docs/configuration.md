@@ -292,12 +292,40 @@ rewget --rewget-completions=bash
 
 | File | Location | Description |
 |------|----------|-------------|
+| Config file | `~/.config/rewget/config.toml` | Optional persistent settings |
 | Stage cache | `~/.cache/rewget/stage-cache.json` | Domain → stage mapping |
 | Profiles | `~/.local/share/rewget/profiles/` | Browser profile definitions |
 | Chromium | `~/.local/share/rewget/chromium/` | Chrome for Testing installation |
 
+## Config File
+
+rewget reads an optional TOML config file from `~/.config/rewget/config.toml`. All sections and keys are optional. Missing values fall back to the built-in defaults shown below.
+
+```toml
+[fallback]
+# Master switch. If false, rewget never escalates (acts like --rewget-no-fallback).
+enabled = true
+# HTTP status codes that trigger fallback.
+codes = [403, 429, 503, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529]
+# Scan response bodies for known challenge markers.
+body_detection = true
+
+[daemon]
+# How long rewgetd stays alive after the last request (seconds).
+idle_timeout = 300
+# Number of pre-warmed Chromium contexts in the pool.
+browser_pool_size = 2
+
+[profiles]
+# Default profile name when --rewget-profile is not given.
+default = "chrome"
+# Auto-update profiles on first run of the day.
+auto_update = false
+```
+
 ## Configuration Precedence
 
 1. Command-line flags (highest priority)
-2. Environment variables
-3. Default values (lowest priority)
+2. Environment variables (`RWGET_ENGINE`)
+3. `~/.config/rewget/config.toml`
+4. Default values (lowest priority)

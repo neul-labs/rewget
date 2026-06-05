@@ -235,17 +235,43 @@ rewget and rewgetd communicate via nng (nanomsg-next-gen) using JSON messages.
 }
 ```
 
+## Fetch Orchestrator
+
+The fallback pipeline is modeled as an explicit state machine in `crates/rewget-core/src/orchestrator.rs`. States:
+
+| State | Meaning |
+|-------|---------|
+| `Idle` | About to start; checks cache first |
+| `RunningStage { stage }` | Waiting for the driver to execute the stage |
+| `Detecting { stage, result }` | Stage finished; analyzing exit code and detection |
+| `CachedSkip { stage }` | Cache hit; jump straight to a known-working stage |
+| `Success { stage }` | Fetch succeeded; cache stage for the domain |
+| `Blocked { stage, reason }` | Block detected; try the next stage if allowed |
+| `Exhausted { last_reason }` | All stages exhausted; give up |
+| `Failed { exit_code }` | Non-blocked failure; propagate wget's exit code |
+| `Error { error }` | Terminal error |
+
+The driver in `crates/rewget/src/exec.rs` calls `next_action()` to get a `FetchAction` (`RunWget`, `RunImpersonate`, `RunPreflight`, `CacheHit`, `Complete`, `GiveUp`, `Fatal`, `Propagate`) and reports back with `report_stage1`/`report_stage2`/`report_stage3`.
+
+The `fallback_stage` config field acts as a ceiling: `Blocked` only transitions to the next stage if that stage is `<= config.fallback_stage`.
+
 ## Key Dependencies
 
-| Crate | Purpose |
-|-------|---------|
-| `rquest` | HTTP client with TLS impersonation |
-| `chromiumoxide` | Chrome DevTools Protocol client |
-| `nng` | IPC transport |
-| `clap` | CLI argument parsing |
-| `serde` | JSON serialization |
-| `ed25519-dalek` | Profile signature verification |
-| `tokio` | Async runtime (daemon) |
+Versions are pinned in the workspace `Cargo.toml`:
+
+| Crate | Version | Purpose |
+|-------|---------|---------|
+| `rquest` | 5.1 | HTTP client with TLS impersonation |
+| `rquest-util` | 2.2 | Profile presets for rquest |
+| `chromiumoxide` | 0.7 | Chrome DevTools Protocol client (tokio runtime) |
+| `nng` | 1.0 | IPC transport |
+| `clap` | 4.0 | CLI argument parsing (with `derive`, `string`) |
+| `clap_complete` | 4.5 | Shell completions |
+| `clap_mangen` | 0.2 | Man page generation |
+| `serde` / `serde_json` | 1.0 | JSON serialization |
+| `ed25519-dalek` | 2.1 | Profile signature verification |
+| `tokio` | 1.0 | Async runtime (daemon) |
+| `mimalloc` | 0.1 | Memory allocator |
 
 ## Platform-Specific Code
 

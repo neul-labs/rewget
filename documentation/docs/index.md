@@ -54,14 +54,12 @@ rewget https://protected-site.com/file.tar.gz
 
 ## Why rewget?
 
-Many websites now block wget and curl with bot detection systems like:
+Many websites now block wget and curl with bot detection systems. rewget detects blocks two ways:
 
-- **Cloudflare** - TLS fingerprinting, JavaScript challenges
-- **Akamai** - Bot Manager, behavioral analysis
-- **PerimeterX** - Advanced bot detection
-- **DataDome** - Real-time bot protection
+- **HTTP status codes**: default fallback codes are `403, 429, 503, 520-529` (configurable via `--rewget-fallback-codes`)
+- **Body patterns**: known challenge markers such as `cf-browser-verification`, `Just a moment`, `Pardon Our Interruption`, `Checking your browser`, `Attention Required`, `captcha-delivery`
 
-rewget handles these automatically by progressively escalating through detection bypass techniques.
+When either signal trips, rewget escalates to the next stage automatically. See [detection.rs](https://github.com/neul-labs/rewget/blob/main/crates/rewget-core/src/detection.rs) for the full pattern list.
 
 ## Features
 
@@ -70,9 +68,10 @@ rewget handles these automatically by progressively escalating through detection
 | **3-Stage Fallback** | wget → TLS impersonation → JavaScript preflight |
 | **6 Browser Profiles** | Chrome, Firefox, Safari, Edge with accurate fingerprints |
 | **Domain Caching** | Remembers successful stage per domain (7-day TTL) |
-| **Auto Chromium** | Downloads browser on first use (~150MB) |
-| **Remote Updates** | Keep profiles current with `--rewget-update-profiles` |
-| **Cross-Platform** | Linux, macOS |
+| **Auto Chromium** | Downloads Chrome for Testing on first use (~150MB) |
+| **Signed Updates** | Profile updates verified with Ed25519 (`--rewget-update-profiles`) |
+| **wget or wget2** | Pluggable engine via `--rewget-engine` or `RWGET_ENGINE` |
+| **Cross-Platform** | Linux (x86_64, aarch64), macOS (Intel, Apple Silicon) |
 
 ## Installation
 
