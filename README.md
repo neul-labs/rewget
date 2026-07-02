@@ -10,6 +10,10 @@
 [![Platform](https://img.shields.io/badge/platform-linux%20%7C%20macos-lightgrey)](https://github.com/neul-labs/rewget/releases)
 [![Docs](https://img.shields.io/badge/docs-docs.neullabs.com-blue)](https://docs.neullabs.com/rewget)
 
+**[Website](https://rewget.neullabs.com) · [Documentation](https://docs.neullabs.com/rewget) · [GitHub](https://github.com/neul-labs/rewget)**
+
+> **See also: [recurl](https://github.com/neul-labs/recurl)** — the `curl` counterpart to rewget.
+
 A drop-in wget replacement that automatically bypasses bot protection. When sites block wget with 403s or CAPTCHAs, rewget seamlessly retries with browser-like TLS fingerprints and JavaScript rendering.
 
 ---
@@ -236,6 +240,18 @@ docs/
 | [CLI Reference](docs/cli.md) | All flags and options |
 | [Impersonation](docs/impersonation.md) | TLS fingerprinting details |
 | [Daemon](docs/daemon.md) | Daemon internals |
+
+## Part of the Neul Labs toolchain
+
+rewget and [recurl](https://github.com/neul-labs/recurl) are a natural pair — the `wget` and `curl` halves of the same "just works" toolkit. Both live in the Neul Labs command-line & filesystem toolchain:
+
+| Project | What it does |
+|---------|--------------|
+| [recurl](https://github.com/neul-labs/recurl) | curl that just works — the `curl` counterpart to rewget. |
+| [stout](https://github.com/neul-labs/stout) | A drop-in replacement for the Homebrew CLI that's 10-100x faster. |
+| [stratafs](https://github.com/neul-labs/stratafs) | A semantic filesystem for AI-era search. |
+
+Explore the full toolchain at [neullabs.com](https://www.neullabs.com).
 
 ## License
 

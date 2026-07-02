@@ -1,13 +1,17 @@
 {
   "name": "rewget",
   "version": "1.0.1",
-  "description": "wget-compatible wrapper with automatic fallback for blocked requests",
+  "description": "A drop-in wget replacement that automatically bypasses bot protection",
+  "author": "Neul Labs <contact@neullabs.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/neul-labs/rewget.git",
     "directory": "packages/npm"
   },
-  "homepage": "https://github.com/neul-labs/rewget",
+  "homepage": "https://rewget.neullabs.com",
+  "bugs": {
+    "url": "https://github.com/neul-labs/rewget/issues"
+  },
   "license": "MIT",
   "keywords": [
     "wget",

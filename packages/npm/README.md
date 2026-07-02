@@ -4,6 +4,10 @@
 
 A drop-in replacement for `wget` that automatically bypasses bot protection. When sites block standard wget with 403s, CAPTCHAs, or TLS fingerprinting, rewget seamlessly retries with browser-like behavior — no manual intervention required.
 
+**[Website](https://rewget.neullabs.com) · [Documentation](https://docs.neullabs.com/rewget) · [GitHub](https://github.com/neul-labs/rewget)**
+
+> **See also: [recurl](https://github.com/neul-labs/recurl)** — the `curl` counterpart to rewget.
+
 ---
 
 ## Install
@@ -65,6 +69,18 @@ Results are cached per-domain, so subsequent requests skip straight to the worki
 Full docs: [https://docs.neullabs.com/rewget](https://docs.neullabs.com/rewget)
 
 Repository: [https://github.com/neul-labs/rewget](https://github.com/neul-labs/rewget)
+
+## Part of the Neul Labs toolchain
+
+rewget and [recurl](https://github.com/neul-labs/recurl) are a natural pair — the `wget` and `curl` halves of the same "just works" toolkit:
+
+| Project | What it does |
+|---------|--------------|
+| [recurl](https://github.com/neul-labs/recurl) | curl that just works — the `curl` counterpart to rewget. |
+| [stout](https://github.com/neul-labs/stout) | A drop-in replacement for the Homebrew CLI that's 10-100x faster. |
+| [stratafs](https://github.com/neul-labs/stratafs) | A semantic filesystem for AI-era search. |
+
+Explore the full toolchain at [neullabs.com](https://www.neullabs.com).
 
 ## License
 

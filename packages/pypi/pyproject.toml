@@ -5,12 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "rewget"
 version = "1.0.1"
-description = "wget-compatible wrapper with automatic fallback for blocked requests"
+description = "A drop-in wget replacement that automatically bypasses bot protection"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.8"
 authors = [
-    { name = "Neul Labs" },
+    { name = "Neul Labs", email = "contact@neullabs.com" },
 ]
 keywords = ["wget", "http", "download", "cli", "bot-detection", "tls-impersonation", "cloudflare"]
 classifiers = [
@@ -37,7 +37,7 @@ rewget = "rewget.cli:main"
 rewgetd = "rewget.cli:main_daemon"
 
 [project.urls]
-Homepage = "https://github.com/neul-labs/rewget"
+Homepage = "https://rewget.neullabs.com"
 Documentation = "https://docs.neullabs.com/rewget"
 Repository = "https://github.com/neul-labs/rewget"
 Issues = "https://github.com/neul-labs/rewget/issues"

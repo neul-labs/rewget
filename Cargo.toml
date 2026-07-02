@@ -12,8 +12,8 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/neul-labs/rewget"
 documentation = "https://docs.neullabs.com/rewget"
-homepage = "https://github.com/neul-labs/rewget"
-authors = ["neul-labs"]
+homepage = "https://rewget.neullabs.com"
+authors = ["Neul Labs <contact@neullabs.com>"]
 
 # Release optimizations
 [profile.release]

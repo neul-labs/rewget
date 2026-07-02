@@ -8,8 +8,8 @@ documentation.workspace = true
 homepage.workspace = true
 authors.workspace = true
 readme = "../../README.md"
-description = "wget-compatible wrapper with automatic fallback"
-keywords = ["wget", "http", "download", "cli"]
+description = "A drop-in wget replacement that automatically bypasses bot protection"
+keywords = ["wget", "download", "bot-detection", "tls-impersonation", "cloudflare"]
 categories = ["command-line-utilities", "network-programming"]
 
 [[bin]]
